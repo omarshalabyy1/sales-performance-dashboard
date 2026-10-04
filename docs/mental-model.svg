@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 570" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>Five questions, one star: each dimension answers one question and filters the fact table one way</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="900" height="570" rx="14" fill="#FFFFFF"/>
+
+  <!-- Top: dim_date -->
+  <rect x="325" y="20" width="250" height="120" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="450" y="50" text-anchor="middle" font-size="18" font-weight="700" fill="#2563EB">When?</text>
+  <text x="450" y="73" text-anchor="middle" font-size="14" font-weight="600" fill="#0E1630">dim_date</text>
+  <text x="450" y="100" text-anchor="middle" font-size="14" fill="#475569">Sales page: 2018 against the</text>
+  <text x="450" y="120" text-anchor="middle" font-size="14" fill="#475569">same days of 2017: +145%</text>
+
+  <!-- Left: dim_product -->
+  <rect x="15" y="220" width="255" height="120" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="142" y="250" text-anchor="middle" font-size="18" font-weight="700" fill="#2563EB">What sold?</text>
+  <text x="142" y="273" text-anchor="middle" font-size="14" font-weight="600" fill="#0E1630">dim_product</text>
+  <text x="142" y="300" text-anchor="middle" font-size="14" fill="#475569">Categories page: the top 10</text>
+  <text x="142" y="320" text-anchor="middle" font-size="14" fill="#475569">bring 62% of revenue</text>
+
+  <!-- Right: dim_seller -->
+  <rect x="630" y="220" width="255" height="120" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="757" y="250" text-anchor="middle" font-size="18" font-weight="700" fill="#2563EB">Who sold it?</text>
+  <text x="757" y="273" text-anchor="middle" font-size="14" font-weight="600" fill="#0E1630">dim_seller</text>
+  <text x="757" y="300" text-anchor="middle" font-size="14" fill="#475569">Sellers page: the top 10% of</text>
+  <text x="757" y="320" text-anchor="middle" font-size="14" fill="#475569">sellers bring 67% of revenue</text>
+  <rect x="660" y="352" width="195" height="28" rx="14" fill="#EFF4FF" stroke="#2563EB" stroke-width="1"/>
+  <text x="757" y="371" text-anchor="middle" font-size="13" font-weight="600" fill="#2563EB">Security: 5 region roles</text>
+
+  <!-- Bottom: dim_customer -->
+  <rect x="325" y="410" width="250" height="120" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="450" y="440" text-anchor="middle" font-size="18" font-weight="700" fill="#2563EB">Who bought, and where?</text>
+  <text x="450" y="463" text-anchor="middle" font-size="14" font-weight="600" fill="#0E1630">dim_customer</text>
+  <text x="450" y="490" text-anchor="middle" font-size="14" fill="#475569">93,358 customers, only 3%</text>
+  <text x="450" y="510" text-anchor="middle" font-size="14" fill="#475569">ordered a second time</text>
+
+  <!-- Centre: fact_sales -->
+  <rect x="300" y="190" width="300" height="180" rx="12" fill="#EFF4FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="450" y="221" text-anchor="middle" font-size="19" font-weight="700" fill="#0E1630">fact_sales</text>
+  <text x="450" y="243" text-anchor="middle" font-size="13" fill="#475569">one row per item sold: price, freight</text>
+  <line x1="325" y1="259" x2="575" y2="259" stroke="#BFD0F5" stroke-width="1.5"/>
+  <text x="450" y="286" text-anchor="middle" font-size="18" font-weight="700" fill="#2563EB">How did it go?</text>
+  <text x="450" y="308" text-anchor="middle" font-size="13" fill="#475569">delivery status and review, per order</text>
+  <text x="450" y="340" text-anchor="middle" font-size="15" font-weight="700" fill="#0E1630">late: 2.27 stars</text>
+  <text x="450" y="360" text-anchor="middle" font-size="15" font-weight="700" fill="#0E1630">on time: 4.29 stars</text>
+
+  <!-- Filter arrows: dimension (one) to fact (many) -->
+  <line x1="450" y1="142" x2="450" y2="186" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="272" y1="280" x2="296" y2="280" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="628" y1="280" x2="604" y2="280" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="450" y1="408" x2="450" y2="374" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <text x="15" y="556" font-size="13" fill="#64748B">Each arrow is a one-to-many relationship: the dimension filters the fact table, never the other way.</text>
+</svg>

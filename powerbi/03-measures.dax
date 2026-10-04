@@ -1,0 +1,190 @@
+// 3. Measures
+// Paste each block into _Measures: select _Measures, Home > New measure, paste, Enter.
+// Copy from the measure name down; the comment line above each measure is only for you.
+// Then set the format string (Measure tools > Format, or "Custom" with the string given) and the display folder.
+// Measures with more than one step use variables. Order-level numbers (delivery, reviews) are counted once per
+// order: the fact table is at item grain, so they summarise to one row per order first.
+
+
+// ============================================================
+// Display folder: Sales
+// ============================================================
+
+// Revenue: sum of item prices, freight not included. Format: #,0
+Revenue =
+SUM ( fact_sales[price] )
+
+// Freight: sum of freight charged on the items. Format: #,0
+Freight =
+SUM ( fact_sales[freight_value] )
+
+// Freight % of Revenue: freight as a share of item revenue. Format: 0.0%
+Freight % of Revenue =
+DIVIDE ( [Freight], [Revenue] )
+
+// Items Sold: number of order items. Format: #,0
+Items Sold =
+COUNTROWS ( fact_sales )
+
+// Revenue LY: revenue of the same days one year earlier, only up to the last sale date,
+// and only when one year is in context (blank across several years). Format: #,0
+Revenue LY =
+VAR LastYearDates =
+    CALCULATETABLE (
+        DATEADD ( dim_date[Date], -1, YEAR ),
+        dim_date[Date With Sales] = TRUE
+    )
+RETURN
+    IF ( HASONEVALUE ( dim_date[Year] ), CALCULATE ( [Revenue], LastYearDates ) )
+
+// Revenue vs LY %: growth against the same days last year. Format: +0.0%;-0.0%;0.0%
+Revenue vs LY % =
+VAR CurrentRevenue = [Revenue]
+VAR LastYearRevenue = [Revenue LY]
+RETURN
+    DIVIDE ( CurrentRevenue - LastYearRevenue, LastYearRevenue )
+
+
+// ============================================================
+// Display folder: Orders and customers
+// ============================================================
+
+// Orders: number of delivered orders. Format: #,0
+Orders =
+DISTINCTCOUNT ( fact_sales[order_id] )
+
+// Average Order Value: item revenue per order. Format: #,0.00
+Average Order Value =
+DIVIDE ( [Revenue], [Orders] )
+
+// Customers: number of people who bought (customer_unique_id), not addresses. Format: #,0
+Customers =
+VAR Buyers =
+    SUMMARIZE ( fact_sales, dim_customer[customer_unique_id] )
+RETURN
+    COUNTROWS ( Buyers )
+
+// Repeat Customers %: share of customers with two or more orders. Format: 0.0%
+Repeat Customers % =
+VAR OrdersPerCustomer =
+    ADDCOLUMNS (
+        SUMMARIZE ( fact_sales, dim_customer[customer_unique_id] ),
+        "@Orders", [Orders]
+    )
+VAR Repeaters =
+    FILTER ( OrdersPerCustomer, [@Orders] >= 2 )
+RETURN
+    DIVIDE ( COUNTROWS ( Repeaters ), COUNTROWS ( OrdersPerCustomer ) )
+
+
+// ============================================================
+// Display folder: Delivery
+// ============================================================
+
+// Orders With Delivery Date: delivered orders that have a delivery date (the base of Late Deliveries %). Format: #,0
+Orders With Delivery Date =
+CALCULATE ( [Orders], fact_sales[delivery_status] <> "No date" )
+
+// Late Orders: orders delivered after the estimated date. Format: #,0
+Late Orders =
+CALCULATE ( [Orders], fact_sales[delivery_status] = "Late" )
+
+// Late Deliveries %: share of orders delivered after the estimated date. Format: 0.0%
+Late Deliveries % =
+DIVIDE ( [Late Orders], [Orders With Delivery Date] )
+
+// Average Delivery Days: days from purchase to delivery, once per order. Format: 0.0
+Average Delivery Days =
+VAR PerOrder =
+    FILTER (
+        SUMMARIZE ( fact_sales, fact_sales[order_id], fact_sales[delivery_days] ),
+        NOT ISBLANK ( fact_sales[delivery_days] )
+    )
+RETURN
+    AVERAGEX ( PerOrder, fact_sales[delivery_days] )
+
+
+// ============================================================
+// Display folder: Reviews
+// ============================================================
+
+// Average Review: average review score, once per reviewed order. Format: 0.00
+Average Review =
+VAR ReviewedOrders =
+    FILTER (
+        SUMMARIZE ( fact_sales, fact_sales[order_id], fact_sales[review_score] ),
+        NOT ISBLANK ( fact_sales[review_score] )
+    )
+RETURN
+    AVERAGEX ( ReviewedOrders, fact_sales[review_score] )
+
+// Average Review On Time: average review of orders delivered on time. Format: 0.00
+Average Review On Time =
+CALCULATE ( [Average Review], fact_sales[delivery_status] = "On time" )
+
+// Average Review Late: average review of orders delivered late. Format: 0.00
+Average Review Late =
+CALCULATE ( [Average Review], fact_sales[delivery_status] = "Late" )
+
+// Review Share %: share of reviewed orders at each score (for the chart with review_score on the axis). Format: 0%
+Review Share % =
+VAR OrdersAtScore = [Orders]
+VAR ReviewedOrders =
+    CALCULATE ( [Orders], NOT ISBLANK ( fact_sales[review_score] ) )
+RETURN
+    DIVIDE ( OrdersAtScore, ReviewedOrders )
+
+
+// ============================================================
+// Display folder: Categories
+// ============================================================
+
+// Categories With Sales: number of categories that sold something. Format: #,0
+Categories With Sales =
+VAR SoldCategories =
+    SUMMARIZE ( fact_sales, dim_product[category] )
+RETURN
+    COUNTROWS ( SoldCategories )
+
+// Share of Revenue %: a category's (or any row's) share of all category revenue. Format: 0.0%
+Share of Revenue % =
+VAR RowRevenue = [Revenue]
+VAR AllCategoriesRevenue =
+    CALCULATE ( [Revenue], REMOVEFILTERS ( dim_product ) )
+RETURN
+    DIVIDE ( RowRevenue, AllCategoriesRevenue )
+
+// Top 10 Categories Share: revenue share of the 10 largest categories. Format: 0.0%
+Top 10 Categories Share =
+VAR CategoryRevenue =
+    ADDCOLUMNS (
+        SUMMARIZE ( fact_sales, dim_product[category] ),
+        "@Revenue", [Revenue]
+    )
+VAR Top10 =
+    TOPN ( 10, CategoryRevenue, [@Revenue], DESC )
+RETURN
+    DIVIDE ( SUMX ( Top10, [@Revenue] ), SUMX ( CategoryRevenue, [@Revenue] ) )
+
+
+// ============================================================
+// Display folder: Sellers
+// ============================================================
+
+// Active Sellers: sellers with at least one delivered sale. Format: #,0
+Active Sellers =
+DISTINCTCOUNT ( fact_sales[seller_id] )
+
+// Top 10% Sellers Share: revenue share of the largest tenth of sellers (rounded up). Format: 0.0%
+Top 10% Sellers Share =
+VAR SellerRevenue =
+    ADDCOLUMNS (
+        SUMMARIZE ( fact_sales, dim_seller[seller_id] ),
+        "@Revenue", [Revenue]
+    )
+VAR TopCount =
+    ROUNDUP ( COUNTROWS ( SellerRevenue ) / 10, 0 )
+VAR TopSellers =
+    TOPN ( TopCount, SellerRevenue, [@Revenue], DESC )
+RETURN
+    DIVIDE ( SUMX ( TopSellers, [@Revenue] ), SUMX ( SellerRevenue, [@Revenue] ) )
