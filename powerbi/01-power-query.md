@@ -264,6 +264,36 @@ in
 
 Expected: **99,441 rows**, no `Unknown` region.
 
+## Columns that load
+
+What each loaded table must contain after **Close & apply** (no renames anywhere: the names are the source names).
+
+| Table | Column | Type |
+|---|---|---|
+| `fact_sales` | `order_id` | Text |
+| | `order_item_id` | Whole number |
+| | `product_id` | Text |
+| | `seller_id` | Text |
+| | `price` | Fixed decimal number |
+| | `freight_value` | Fixed decimal number |
+| | `customer_id` | Text |
+| | `order_date` | Date |
+| | `delivery_days` | Whole number |
+| | `delivery_status` | Text (`On time`, `Late`, `No date`) |
+| | `review_score` | Whole number (1 to 5, blank when no review) |
+| `dim_product` | `product_id` | Text |
+| | `category` | Text |
+| `dim_seller` | `seller_id` | Text |
+| | `seller_city` | Text |
+| | `seller_state` | Text |
+| | `seller_region` | Text |
+| | `seller_short_id` | Text |
+| `dim_customer` | `customer_id` | Text |
+| | `customer_unique_id` | Text |
+| | `customer_city` | Text |
+| | `customer_state` | Text |
+| | `customer_region` | Text |
+
 ## Finish
 
 **Home → Close & apply.** Then check the row counts in the Data view (bottom left shows the row count of the

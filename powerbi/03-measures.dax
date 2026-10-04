@@ -4,6 +4,18 @@
 // Then set the format string (Measure tools > Format, or "Custom" with the string given) and the display folder.
 // Measures with more than one step use variables. Order-level numbers (delivery, reviews) are counted once per
 // order: the fact table is at item grain, so they summarise to one row per order first.
+// No calculated columns. Calculated tables: dim_date (DAX, in 02-model.md) and _Measures (Enter data).
+//
+// Measures by page (23 in all; the two marked "helper" sit inside other measures and on no visual):
+//   Overview    Revenue, Orders, Customers, Repeat Customers %, Late Deliveries %, Average Review,
+//               Average Review On Time, Average Review Late
+//   Sales       Revenue, Revenue LY, Revenue vs LY %, Orders, Average Order Value, Freight % of Revenue
+//   Categories  Revenue, Items Sold, Categories With Sales, Top 10 Categories Share, Share of Revenue %,
+//               Average Review, Late Deliveries %
+//   Sellers     Active Sellers, Top 10% Sellers Share, Revenue, Orders, Late Deliveries %, Average Review
+//   Delivery    Average Delivery Days, Late Deliveries %, Late Orders, Average Review On Time,
+//               Average Review Late, Review Share %
+//   Helpers     Freight (inside Freight % of Revenue), Orders With Delivery Date (inside Late Deliveries %)
 
 
 // ============================================================

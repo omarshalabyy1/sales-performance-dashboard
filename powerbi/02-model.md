@@ -65,12 +65,27 @@ measure into it (file `03-measures.dax`), hide the empty `Column1`; the table mo
 
 **Modeling → Manage relationships → New**, four times. Delete any relationship Power BI created by itself first.
 
-| From (many) | To (one) | Cardinality | Cross-filter direction | Active |
-|---|---|---|---|---|
-| `fact_sales[order_date]` | `dim_date[Date]` | Many to one | Single | Yes |
-| `fact_sales[product_id]` | `dim_product[product_id]` | Many to one | Single | Yes |
-| `fact_sales[seller_id]` | `dim_seller[seller_id]` | Many to one | Single | Yes |
-| `fact_sales[customer_id]` | `dim_customer[customer_id]` | Many to one | Single | Yes |
+| From (many) | To (one) | Cardinality | Cross-filter direction | Active | Why |
+|---|---|---|---|---|---|
+| `fact_sales[order_date]` | `dim_date[Date]` | Many to one | Single | Yes | Every time filter and `Revenue LY` go through the date table |
+| `fact_sales[product_id]` | `dim_product[product_id]` | Many to one | Single | Yes | Category charts and tables filter the sales |
+| `fact_sales[seller_id]` | `dim_seller[seller_id]` | Many to one | Single | Yes | Carries the row-level security filter to every sale |
+| `fact_sales[customer_id]` | `dim_customer[customer_id]` | Many to one | Single | Yes | Customer region and state filter the sales |
+
+No both-direction filters and no inactive relationships: one path from each dimension to the fact keeps every
+total unambiguous.
+
+## Design choices
+
+| Choice | Why |
+|---|---|
+| Fact table at order-item grain | Revenue, category and seller exist per item; an order can hold items from several sellers |
+| Order-level columns repeated on each item | Avoids a second fact table; measures summarise to one row per order before averaging |
+| Date table in DAX, whole years | Time intelligence (`DATEADD`) needs a continuous, complete calendar |
+| `Date With Sales` flag | The data ends on 29 Aug 2018, so last year must stop on 29 Aug 2017 |
+| Separate `_Measures` table | All measures in one place, apart from the columns |
+| Keys and raw amounts hidden | Report users use measures, so nobody sums `price` by hand or drags an id into a chart |
+| Static roles per region | Five regions, one filter each: simpler than a user-to-region mapping table |
 
 ## Hide these columns
 
@@ -97,9 +112,19 @@ Select the column, then **Column tools → Sort by column**:
 
 ## Formats and summarisation
 
-- `fact_sales[review_score]`, `dim_date[Year]`: **Column tools → Summarization → Don't summarize**.
-- `dim_date[Date]`: format `dd mmm yyyy`.
-- Measures carry their own format strings (see `03-measures.dax`).
+Select the column, then **Column tools**:
+
+| Column | Format | Summarization | Why |
+|---|---|---|---|
+| `dim_date[Date]` | `dd mmm yyyy` | | Readable dates in tooltips |
+| `dim_date[Year]` | Whole number, no thousands separator | Don't summarize | Shows 2018, not 2,018, and never adds years up |
+| `fact_sales[review_score]` | Whole number | Don't summarize | A score is a label on the axis, not a number to add |
+| `fact_sales[delivery_days]` | Whole number | Don't summarize | Hidden; only `Average Delivery Days` uses it |
+| `fact_sales[price]`, `fact_sales[freight_value]` | Decimal, 2 places | Sum | Hidden; only the measures use them |
+| All other columns | as loaded | Don't summarize | Text, ids and labels |
+
+Data category stays **Uncategorized** for every column: the report has no maps.
+Measures carry their own format strings (see `03-measures.dax`).
 
 ## Display folders
 
