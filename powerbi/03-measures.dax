@@ -192,16 +192,16 @@ DISTINCTCOUNT ( fact_sales[seller_id] )
 
 // Top Sellers Share: revenue share of the largest N% of sellers (rounded up), N = report.top_sellers_percent. Format: 0.0%
 Top Sellers Share =
-VAR Percent =
+VAR SellerPercent =
     MAX ( report_settings[top_sellers_percent] )
 VAR SellerRevenue =
     ADDCOLUMNS (
         SUMMARIZE ( fact_sales, dim_seller[seller_id] ),
         "@Revenue", [Revenue]
     )
-VAR TopCount =
-    ROUNDUP ( COUNTROWS ( SellerRevenue ) * Percent / 100, 0 )
+VAR SellersInTop =
+    ROUNDUP ( COUNTROWS ( SellerRevenue ) * SellerPercent / 100, 0 )
 VAR TopSellers =
-    TOPN ( TopCount, SellerRevenue, [@Revenue], DESC )
+    TOPN ( SellersInTop, SellerRevenue, [@Revenue], DESC )
 RETURN
     DIVIDE ( SUMX ( TopSellers, [@Revenue] ), SUMX ( SellerRevenue, [@Revenue] ) )

@@ -28,7 +28,7 @@ Slicers cleared ("All") unless the row says otherwise. Display units as set in `
 | C10 | Late deliveries card | 6.8% | 6.77% |
 | C11 | Average review card | 4.16 | |
 | C12 | Revenue by customer region, first bar | Southeast, 8.6M | 8,648,409.57 |
-| C13 | Top categories, first bar | health beauty, 1.23M | 1,233,131.72 |
+| C13 | Top 5 categories, first bar | health beauty, 1.23M | 1,233,131.72 |
 | C14 | Average review, on time against late | 4.29 and 2.27 | |
 
 ## Sales (Year slicer = `report.compare_year`, demo 2018)
@@ -73,7 +73,7 @@ Slicers cleared ("All") unless the row says otherwise. Display units as set in `
 | C35 | Average review, on time card | 4.29 | |
 | C36 | Average review, late card | 2.27 | |
 | C37 | Review scores chart, 1 star | Late 54%, On time 7% | 53.8% and 6.6% |
-| C38 | 10 states with the most late deliveries, first bar | AL, 21.4% | |
+| C38 | 10 states with the most late deliveries, first column | AL, 21.4% | |
 
 ## Row-level security (Modeling → View as)
 

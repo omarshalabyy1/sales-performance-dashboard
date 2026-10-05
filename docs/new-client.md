@@ -21,7 +21,8 @@ What the client gets with no work. Hours are an estimate of building each part f
 | D | The SQL recount: DuckDB views from the config, the rules as parameters, the notebook stops if a total differs (`sql/checks.sql`, section 11) | 1.5 |
 | E | Power BI build pack: 5 queries, the model with a DAX date table and one security role per region, 23 measures, 5 pages with 41 visuals, interactions, 43 checks, a 47-step checklist (`powerbi/`) | 8 |
 | F | README with its diagrams, and the input file guide (`data/input/README.md`) | 2.5 |
-| | **Total** | **20** |
+| G | The finished report: `powerbi/build_pbip.py` writes `sales-performance.pbip` from the build pack and the config; every check verified against the model running in Power BI Desktop | 2 |
+| | **Total** | **22** |
 
 ## Configure
 
@@ -36,8 +37,8 @@ Per client, file by file. Hours are an estimate.
 | `data/input/` category names file | the name shown for each category code | `KIT,Kitchen` | 0.5 |
 | Run `python config.py`, the notebook and `python theme.py`; go through the health check (section 2) with the client and fix the config | | | 1 |
 | | **Subtotal without Power BI** | | **3.5** |
-| `powerbi/` | build from `08-build-checklist.md`; refill `06-checks.md` from the notebook's section 12 (same check numbers) | | 3 |
-| | **Total** | | **6.5** |
+| `powerbi/` | `python powerbi/build_pbip.py`, open `sales-performance.pbip`, **Refresh now**; refill `06-checks.md` from the notebook's section 12 (same check numbers) and compare | | 1 |
+| | **Total** | | **4.5** |
 
 ## Custom, for offering 10
 
@@ -60,8 +61,8 @@ Template hours ÷ (template + configure + custom) hours:
 
 | Offering | Arithmetic | Share already done |
 |---|---|---|
-| 10. Power BI sales and margin dashboard | 20 ÷ (20 + 6.5 + 7) = 20 ÷ 33.5 | **60%** (59.7%) |
-| 10, a client that needs no margin page | 20 ÷ (20 + 6.5 + 3) = 20 ÷ 29.5 | **68%** (67.8%) |
+| 10. Power BI sales and margin dashboard | 22 ÷ (22 + 4.5 + 7) = 22 ÷ 33.5 | **66%** (65.7%) |
+| 10, a client that needs no margin page | 22 ÷ (22 + 4.5 + 3) = 22 ÷ 29.5 | **75%** (74.6%) |
 
 ## Steps
 
@@ -74,8 +75,8 @@ Template hours ÷ (template + configure + custom) hours:
 5. Run the notebook (`cd analysis`, `jupyter nbconvert --to notebook --execute --inplace analysis.ipynb`). Go
    through the health check (section 2) with the client.
 6. `python theme.py`.
-7. Build the Power BI report from `powerbi/08-build-checklist.md`, after refilling `powerbi/06-checks.md` with the
-   numbers from the notebook's section 12.
+7. `python powerbi/build_pbip.py`, open `powerbi/sales-performance.pbip` in Power BI Desktop and click **Refresh now**.
+   Refill `powerbi/06-checks.md` with the numbers from the notebook's section 12 and compare every page.
 
 ## Second-client drill (2026-10-05)
 
@@ -135,9 +136,13 @@ AssertionError: rules.sale_statuses matches no order status
 The first four come from `python config.py` (and the notebook's first cell); the last two from the notebook's
 health check.
 
+**The report for Client B:** `python powerbi/build_pbip.py` on the same copy wrote two security roles (Greater Cairo,
+North Coast), the teal theme, a "Top 2 categories share" card, "Revenue, EGP" labels and 2025 preselected on the
+Sales page. It was not opened in Power BI Desktop; the demo report was, and all 43 checks matched there.
+
 **Nothing hard-coded:** this search over the notebook's code cells, `config.py`, `theme.py`, `sql/checks.sql`,
-`powerbi/03-measures.dax` and the M and DAX code in `powerbi/01-power-query.md` and `powerbi/02-model.md` finds
-nothing:
+`powerbi/03-measures.dax`, `powerbi/build_pbip.py` and the M and DAX code in `powerbi/01-power-query.md` and
+`powerbi/02-model.md` finds nothing:
 
 ```
 olist|Olist|order_purchase_timestamp|order_delivered_customer_date|order_estimated_delivery_date|order_status|order_item_id|freight_value|product_category_name|customer_unique_id|review_answer_timestamp|["'\[]delivered["'\]]|\bBRL\b|Sample marketplace|\b2016\b|\b2017\b|\b2018\b|Southeast|Northeast|Center-West|\bSP\b|#[0-9A-Fa-f]{6}|TOPN \( 10|/ 10\b|\* 0\.1|regions\.csv|Sales performance
@@ -165,6 +170,11 @@ What this repo needed that `portfolio/docs/template-standard.md` does not say:
 - **Model names that equal demo headers.** `order_id`, `customer_id`, `product_id`, `seller_id`, `review_score`,
   `customer_city`, `customer_state`, `seller_city` and `seller_state` are the template's own column names in
   `output/`, so the search above looks only for the demo headers that differ.
+- **The report is generated, not hand-built.** `powerbi/build_pbip.py` reads the M code, the date table and the
+  measures from the build pack itself, so the files a person follows and the report cannot drift apart.
+- **Run the DAX before trusting it.** Opened in Power BI Desktop, the model rejected `Percent`, `TopPercent` and
+  `TopCount` as variable names (reserved by the engine); checking every card over the local engine with ADOMD.NET
+  caught it, and C1 to C43 then matched.
 - **A tie in the data needs a rule, not a stop.** Two reviews answered at the same moment on one order would have
   stopped the demo version; the template keeps the higher score.
 

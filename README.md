@@ -69,9 +69,32 @@ These are patterns in the data, not proven causes: the report shows where to loo
 
 Five security roles (one per region) limit each regional manager to their own sellers.
 
-Everything needed to build the report is in [`powerbi/`](powerbi/README.md), ready to copy and paste: every Power
-Query step, the model, every measure, every visual with its position and fields, the theme, and the numbers each
-page must show.
+The report is [`powerbi/sales-performance.pbip`](powerbi/README.md): open it in Power BI Desktop and click
+**Refresh now**. It is written by `powerbi/build_pbip.py` from the build pack in [`powerbi/`](powerbi/README.md), which
+also lets you build it by hand: every Power Query step, the model, every measure, every visual with its position and
+fields, the theme, and the numbers each page must show. All 43 checks were run against the model in Power BI Desktop.
+
+### Screenshots
+
+**Overview:** revenue, orders, customers, late deliveries and reviews at a glance.
+
+![Overview page](powerbi/screenshots/01-overview.png)
+
+**Sales:** 2018 against the same days of 2017, month by month and by state.
+
+![Sales page](powerbi/screenshots/02-sales.png)
+
+**Categories:** what sells, and which categories review badly or arrive late.
+
+![Categories page](powerbi/screenshots/03-categories.png)
+
+**Sellers:** the sellers behind the revenue, and those who deliver late and review badly.
+
+![Sellers page](powerbi/screenshots/04-sellers.png)
+
+**Delivery:** how late delivery drags reviews down, and where it happens.
+
+![Delivery page](powerbi/screenshots/05-delivery.png)
 
 ## How the numbers are checked
 
@@ -119,7 +142,7 @@ analysis/            the notebook: health check, model tables, every number, the
 output/              the tables the notebook writes for Power BI (not in the repo)
 sql/                 the SQL cross-check
 docs/                the diagrams and charts used here, and new-client.md
-powerbi/             the step-by-step build, the theme, the checks, and the report once built
+powerbi/             the report (.pbip) and build_pbip.py, the step-by-step build, the theme, the checks, the screenshots
 ```
 
 ## Data

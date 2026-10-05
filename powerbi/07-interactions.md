@@ -19,21 +19,21 @@ Slicers filter every visual on their page (default, nothing to set) and are left
 
 ## Overview
 
-| Click on ↓ / affects → | Revenue by month | Revenue by customer region | Top categories | Average review, on time against late | Cards |
+| Click on ↓ / affects → | Revenue by month | Revenue by customer region | Top 5 categories | Average review, on time against late | Cards |
 |---|---|---|---|---|---|
 | Revenue by month | | Filter | Filter | Filter | Filter |
 | Revenue by customer region | Filter | | Filter | Filter | Filter |
-| Top categories by revenue | Filter | Filter | | Filter | Filter |
+| Top 5 categories by revenue | Filter | Filter | | Filter | Filter |
 | Average review, on time against late | **None** | **None** | **None** | | **None** |
 
 Why None: that chart shows two measures, not a category, so a click on it has nothing to filter by.
 
 ## Sales
 
-| Click on ↓ / affects → | Revenue by month, this year and last year | Revenue by customer state | Month by month | Cards |
+| Click on ↓ / affects → | Revenue by month, this year and last year | Top 15 customer states | Month by month | Cards |
 |---|---|---|---|---|
 | Revenue by month, this year and last year | | Filter | Filter | Filter |
-| Revenue by customer state | Filter | | Filter | Filter |
+| Top 15 customer states by revenue | Filter | | Filter | Filter |
 | Month by month | Filter | Filter | | Filter |
 
 ## Categories
@@ -45,9 +45,9 @@ Why None: that chart shows two measures, not a category, so a click on it has no
 
 ## Sellers
 
-| Click on ↓ / affects → | Revenue by seller state | Late deliveries against reviews | Sellers | Cards |
+| Click on ↓ / affects → | Top 15 seller states | Late deliveries against reviews | Sellers | Cards |
 |---|---|---|---|---|
-| Revenue by seller state | | Filter | Filter | Filter |
+| Top 15 seller states by revenue | | Filter | Filter | Filter |
 | Late deliveries against reviews | Filter | | Filter | Filter |
 | Sellers | Filter | Filter | | Filter |
 
@@ -69,7 +69,7 @@ only and every late-delivery percentage would read 100%.
 |---|---|
 | Report (all pages) | None |
 | Page | None. The Sales page uses its own single-select Year slicer instead of a page filter, so the reader can change the year |
-| Visual | Only the ones listed in `04-pages.md`: Top N on the category and state bar charts, `Orders` >= 30 on the scatter chart, `review_score` is not blank and `delivery_status` is On time or Late on the review chart |
+| Visual | Only the ones listed in `04-pages.md`: Top N on the category and state charts, `Orders` >= 30 on the scatter chart, `review_score` is not blank and `delivery_status` is On time or Late on the review chart |
 
 ## Drill-through, bookmarks, buttons, tooltip pages
 

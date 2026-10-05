@@ -15,7 +15,17 @@ the notebook; `06-checks.md` lists them.
 
 Each regional manager can be limited to the sellers of their region (row-level security, one role per region).
 
-## Follow the files in order
+## The fast way: open the generated report
+
+`sales-performance.pbip` is the finished report as a Power BI project, written by `build_pbip.py` from the files
+below and `config/client.yaml`. After the notebook has written `output/`:
+
+1. `python powerbi/build_pbip.py` (only after a change to the config or to files 01 to 05).
+2. Open `powerbi/sales-performance.pbip` in Power BI Desktop and click **Refresh now** on the yellow bar.
+3. Compare the cards with `06-checks.md`. Every check was verified against the model running in Power BI Desktop
+   on 2026-10-05, C1 to C43, and the five pages are in `screenshots/`.
+
+## Or build it by hand, to learn it
 
 `08-build-checklist.md` is the click-by-click order from opening Power BI Desktop to the last screenshot; it points
 into the other files and says when to compare with each check in `06-checks.md`.
@@ -31,7 +41,8 @@ into the other files and says when to compare with each check in `06-checks.md`.
 | `07-interactions.md` | The edit-interactions matrix per page, filters, and why there is no drill-through or bookmark |
 | `08-build-checklist.md` | The 47 steps, from the input files to the last screenshot, with the checks to make at each point |
 
-The report is saved here as `sales-performance.pbix`, with one screenshot per page in `screenshots/`.
+Built by hand, the report is saved as `sales-performance.pbix`; the generated one is `sales-performance.pbip` with its
+`.Report` and `.SemanticModel` folders. One screenshot per page is in `screenshots/`.
 
 ## Needs
 

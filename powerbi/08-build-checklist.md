@@ -3,6 +3,10 @@
 Follow it top to bottom. **Check** means: compare with that row of `06-checks.md`; if it differs, stop and use
 "If a number is off" there before going on. Save (Ctrl+S) after every block.
 
+The quick route, after steps 1 to 4: `python powerbi/build_pbip.py`, open `powerbi/sales-performance.pbip`, click
+**Refresh now**, then compare every page with `06-checks.md` (C1 to C43; the roles with **Modeling → View as**). The
+steps below build the same report by hand.
+
 ## Data, notebook and settings
 
 1. Put the client's input files in `data/input/` (`data/input/README.md`; for the demo, the main README's "Data").

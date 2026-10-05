@@ -1,0 +1,726 @@
+{
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "expressions": [
+      {
+        "name": "OutputFolder",
+        "kind": "m",
+        "expression": "\"C:\\Users\\DELL\\GitHub\\sales-performance-dashboard\\output\\\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "fact_sales",
+        "columns": [
+          {
+            "name": "order_id",
+            "dataType": "string",
+            "sourceColumn": "order_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "item_no",
+            "dataType": "int64",
+            "sourceColumn": "item_no",
+            "summarizeBy": "none",
+            "formatString": "0",
+            "isHidden": true
+          },
+          {
+            "name": "order_date",
+            "dataType": "dateTime",
+            "sourceColumn": "order_date",
+            "summarizeBy": "none",
+            "formatString": "dd mmm yyyy",
+            "isHidden": true
+          },
+          {
+            "name": "product_id",
+            "dataType": "string",
+            "sourceColumn": "product_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "seller_id",
+            "dataType": "string",
+            "sourceColumn": "seller_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_id",
+            "dataType": "string",
+            "sourceColumn": "customer_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "price",
+            "dataType": "decimal",
+            "sourceColumn": "price",
+            "summarizeBy": "sum",
+            "formatString": "#,0.00",
+            "isHidden": true
+          },
+          {
+            "name": "freight",
+            "dataType": "decimal",
+            "sourceColumn": "freight",
+            "summarizeBy": "sum",
+            "formatString": "#,0.00",
+            "isHidden": true
+          },
+          {
+            "name": "delivery_days",
+            "dataType": "int64",
+            "sourceColumn": "delivery_days",
+            "summarizeBy": "none",
+            "formatString": "0",
+            "isHidden": true
+          },
+          {
+            "name": "delivery_status",
+            "dataType": "string",
+            "sourceColumn": "delivery_status",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "review_score",
+            "dataType": "int64",
+            "sourceColumn": "review_score",
+            "summarizeBy": "none",
+            "formatString": "0"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_sales",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(",
+                "        File.Contents(OutputFolder & \"fact_sales.csv\"),",
+                "        [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]",
+                "    ),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    ChangedType = Table.TransformColumnTypes(",
+                "        PromotedHeaders,",
+                "        {",
+                "            {\"order_id\", type text},",
+                "            {\"item_no\", Int64.Type},",
+                "            {\"order_date\", type date},",
+                "            {\"product_id\", type text},",
+                "            {\"seller_id\", type text},",
+                "            {\"customer_id\", type text},",
+                "            {\"price\", Currency.Type},",
+                "            {\"freight\", Currency.Type},",
+                "            {\"delivery_days\", Int64.Type},",
+                "            {\"delivery_status\", type text},",
+                "            {\"review_score\", Int64.Type}",
+                "        },",
+                "        \"en-US\"",
+                "    )",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_product",
+        "columns": [
+          {
+            "name": "product_id",
+            "dataType": "string",
+            "sourceColumn": "product_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "category",
+            "dataType": "string",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_product",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(",
+                "        File.Contents(OutputFolder & \"dim_product.csv\"),",
+                "        [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]",
+                "    ),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    ChangedType = Table.TransformColumnTypes(PromotedHeaders, {{\"product_id\", type text}, {\"category\", type text}}, \"en-US\")",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_seller",
+        "columns": [
+          {
+            "name": "seller_id",
+            "dataType": "string",
+            "sourceColumn": "seller_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "seller_city",
+            "dataType": "string",
+            "sourceColumn": "seller_city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "seller_state",
+            "dataType": "string",
+            "sourceColumn": "seller_state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "seller_region",
+            "dataType": "string",
+            "sourceColumn": "seller_region",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "seller_short_id",
+            "dataType": "string",
+            "sourceColumn": "seller_short_id",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_seller",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(",
+                "        File.Contents(OutputFolder & \"dim_seller.csv\"),",
+                "        [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]",
+                "    ),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    ChangedType = Table.TransformColumnTypes(",
+                "        PromotedHeaders,",
+                "        {",
+                "            {\"seller_id\", type text},",
+                "            {\"seller_city\", type text},",
+                "            {\"seller_state\", type text},",
+                "            {\"seller_region\", type text},",
+                "            {\"seller_short_id\", type text}",
+                "        },",
+                "        \"en-US\"",
+                "    )",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_customer",
+        "columns": [
+          {
+            "name": "customer_id",
+            "dataType": "string",
+            "sourceColumn": "customer_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "person_id",
+            "dataType": "string",
+            "sourceColumn": "person_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_city",
+            "dataType": "string",
+            "sourceColumn": "customer_city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customer_state",
+            "dataType": "string",
+            "sourceColumn": "customer_state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customer_region",
+            "dataType": "string",
+            "sourceColumn": "customer_region",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_customer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(",
+                "        File.Contents(OutputFolder & \"dim_customer.csv\"),",
+                "        [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]",
+                "    ),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    ChangedType = Table.TransformColumnTypes(",
+                "        PromotedHeaders,",
+                "        {",
+                "            {\"customer_id\", type text},",
+                "            {\"person_id\", type text},",
+                "            {\"customer_city\", type text},",
+                "            {\"customer_state\", type text},",
+                "            {\"customer_region\", type text}",
+                "        },",
+                "        \"en-US\"",
+                "    )",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "report_settings",
+        "columns": [
+          {
+            "name": "top_categories",
+            "dataType": "int64",
+            "sourceColumn": "top_categories",
+            "summarizeBy": "none",
+            "formatString": "0"
+          },
+          {
+            "name": "top_sellers_percent",
+            "dataType": "int64",
+            "sourceColumn": "top_sellers_percent",
+            "summarizeBy": "none",
+            "formatString": "0"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "report_settings",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(",
+                "        File.Contents(OutputFolder & \"report_settings.csv\"),",
+                "        [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]",
+                "    ),",
+                "    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    ChangedType = Table.TransformColumnTypes(",
+                "        PromotedHeaders,",
+                "        {{\"top_categories\", Int64.Type}, {\"top_sellers_percent\", Int64.Type}},",
+                "        \"en-US\"",
+                "    )",
+                "in",
+                "    ChangedType"
+              ]
+            }
+          }
+        ],
+        "isHidden": true
+      },
+      {
+        "name": "dim_date",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "formatString": "dd mmm yyyy",
+            "isKey": true
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Year",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Year]",
+            "summarizeBy": "none",
+            "formatString": "0"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Month Number",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Month Number]",
+            "summarizeBy": "none",
+            "formatString": "0",
+            "isHidden": true
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Month",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Month]",
+            "summarizeBy": "none",
+            "sortByColumn": "Month Number"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Year Month",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Year Month]",
+            "summarizeBy": "none",
+            "sortByColumn": "Year Month Number"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Year Month Number",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Year Month Number]",
+            "summarizeBy": "none",
+            "formatString": "0",
+            "isHidden": true
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Date With Sales",
+            "dataType": "boolean",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Date With Sales]",
+            "summarizeBy": "none",
+            "isHidden": true
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_date",
+            "mode": "import",
+            "source": {
+              "type": "calculated",
+              "expression": [
+                "VAR FirstYear = YEAR ( MIN ( fact_sales[order_date] ) )",
+                "VAR LastYear = YEAR ( MAX ( fact_sales[order_date] ) )",
+                "VAR LastSaleDate = MAX ( fact_sales[order_date] )",
+                "RETURN",
+                "    ADDCOLUMNS (",
+                "        CALENDAR ( DATE ( FirstYear, 1, 1 ), DATE ( LastYear, 12, 31 ) ),",
+                "        \"Year\", YEAR ( [Date] ),",
+                "        \"Month Number\", MONTH ( [Date] ),",
+                "        \"Month\", FORMAT ( [Date], \"mmm\" ),",
+                "        \"Year Month\", FORMAT ( [Date], \"mmm yyyy\" ),",
+                "        \"Year Month Number\", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),",
+                "        \"Date With Sales\", [Date] <= LastSaleDate",
+                "    )"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "_Measures",
+        "columns": [
+          {
+            "name": "Column1",
+            "dataType": "string",
+            "sourceColumn": "Column1",
+            "summarizeBy": "none",
+            "isHidden": true
+          }
+        ],
+        "partitions": [
+          {
+            "name": "_Measures",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #table(type table [Column1 = text], {})",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Revenue",
+            "expression": "SUM ( fact_sales[price] )",
+            "formatString": "#,0",
+            "displayFolder": "Sales"
+          },
+          {
+            "name": "Freight",
+            "expression": "SUM ( fact_sales[freight] )",
+            "formatString": "#,0",
+            "displayFolder": "Sales"
+          },
+          {
+            "name": "Freight % of Revenue",
+            "expression": "DIVIDE ( [Freight], [Revenue] )",
+            "formatString": "0.0%",
+            "displayFolder": "Sales"
+          },
+          {
+            "name": "Items Sold",
+            "expression": "COUNTROWS ( fact_sales )",
+            "formatString": "#,0",
+            "displayFolder": "Sales"
+          },
+          {
+            "name": "Revenue LY",
+            "expression": "VAR LastYearDates =\n    CALCULATETABLE (\n        DATEADD ( dim_date[Date], -1, YEAR ),\n        dim_date[Date With Sales] = TRUE\n    )\nRETURN\n    IF ( HASONEVALUE ( dim_date[Year] ), CALCULATE ( [Revenue], LastYearDates ) )",
+            "formatString": "#,0",
+            "displayFolder": "Sales"
+          },
+          {
+            "name": "Revenue vs LY %",
+            "expression": "VAR CurrentRevenue = [Revenue]\nVAR LastYearRevenue = [Revenue LY]\nRETURN\n    DIVIDE ( CurrentRevenue - LastYearRevenue, LastYearRevenue )",
+            "formatString": "+0.0%;-0.0%;0.0%",
+            "displayFolder": "Sales"
+          },
+          {
+            "name": "Orders",
+            "expression": "DISTINCTCOUNT ( fact_sales[order_id] )",
+            "formatString": "#,0",
+            "displayFolder": "Orders and customers"
+          },
+          {
+            "name": "Average Order Value",
+            "expression": "DIVIDE ( [Revenue], [Orders] )",
+            "formatString": "#,0.00",
+            "displayFolder": "Orders and customers"
+          },
+          {
+            "name": "Customers",
+            "expression": "VAR Buyers =\n    SUMMARIZE ( fact_sales, dim_customer[person_id] )\nRETURN\n    COUNTROWS ( Buyers )",
+            "formatString": "#,0",
+            "displayFolder": "Orders and customers"
+          },
+          {
+            "name": "Repeat Customers %",
+            "expression": "VAR OrdersPerCustomer =\n    ADDCOLUMNS (\n        SUMMARIZE ( fact_sales, dim_customer[person_id] ),\n        \"@Orders\", [Orders]\n    )\nVAR Repeaters =\n    FILTER ( OrdersPerCustomer, [@Orders] >= 2 )\nRETURN\n    DIVIDE ( COUNTROWS ( Repeaters ), COUNTROWS ( OrdersPerCustomer ) )",
+            "formatString": "0.0%",
+            "displayFolder": "Orders and customers"
+          },
+          {
+            "name": "Orders With Delivery Date",
+            "expression": "CALCULATE ( [Orders], fact_sales[delivery_status] <> \"No date\" )",
+            "formatString": "#,0",
+            "displayFolder": "Delivery"
+          },
+          {
+            "name": "Late Orders",
+            "expression": "CALCULATE ( [Orders], fact_sales[delivery_status] = \"Late\" )",
+            "formatString": "#,0",
+            "displayFolder": "Delivery"
+          },
+          {
+            "name": "Late Deliveries %",
+            "expression": "DIVIDE ( [Late Orders], [Orders With Delivery Date] )",
+            "formatString": "0.0%",
+            "displayFolder": "Delivery"
+          },
+          {
+            "name": "Average Delivery Days",
+            "expression": "VAR PerOrder =\n    FILTER (\n        SUMMARIZE ( fact_sales, fact_sales[order_id], fact_sales[delivery_days] ),\n        NOT ISBLANK ( fact_sales[delivery_days] )\n    )\nRETURN\n    AVERAGEX ( PerOrder, fact_sales[delivery_days] )",
+            "formatString": "0.0",
+            "displayFolder": "Delivery"
+          },
+          {
+            "name": "Average Review",
+            "expression": "VAR ReviewedOrders =\n    FILTER (\n        SUMMARIZE ( fact_sales, fact_sales[order_id], fact_sales[review_score] ),\n        NOT ISBLANK ( fact_sales[review_score] )\n    )\nRETURN\n    AVERAGEX ( ReviewedOrders, fact_sales[review_score] )",
+            "formatString": "0.00",
+            "displayFolder": "Reviews"
+          },
+          {
+            "name": "Average Review On Time",
+            "expression": "CALCULATE ( [Average Review], fact_sales[delivery_status] = \"On time\" )",
+            "formatString": "0.00",
+            "displayFolder": "Reviews"
+          },
+          {
+            "name": "Average Review Late",
+            "expression": "CALCULATE ( [Average Review], fact_sales[delivery_status] = \"Late\" )",
+            "formatString": "0.00",
+            "displayFolder": "Reviews"
+          },
+          {
+            "name": "Review Share %",
+            "expression": "VAR OrdersAtScore = [Orders]\nVAR ReviewedOrders =\n    CALCULATE ( [Orders], NOT ISBLANK ( fact_sales[review_score] ) )\nRETURN\n    DIVIDE ( OrdersAtScore, ReviewedOrders )",
+            "formatString": "0%",
+            "displayFolder": "Reviews"
+          },
+          {
+            "name": "Categories With Sales",
+            "expression": "VAR SoldCategories =\n    SUMMARIZE ( fact_sales, dim_product[category] )\nRETURN\n    COUNTROWS ( SoldCategories )",
+            "formatString": "#,0",
+            "displayFolder": "Categories"
+          },
+          {
+            "name": "Share of Revenue %",
+            "expression": "VAR RowRevenue = [Revenue]\nVAR AllCategoriesRevenue =\n    CALCULATE ( [Revenue], REMOVEFILTERS ( dim_product ) )\nRETURN\n    DIVIDE ( RowRevenue, AllCategoriesRevenue )",
+            "formatString": "0.0%",
+            "displayFolder": "Categories"
+          },
+          {
+            "name": "Top Categories Share",
+            "expression": "VAR N =\n    MAX ( report_settings[top_categories] )\nVAR CategoryRevenue =\n    ADDCOLUMNS (\n        SUMMARIZE ( fact_sales, dim_product[category] ),\n        \"@Revenue\", [Revenue]\n    )\nVAR TopCategories =\n    TOPN ( N, CategoryRevenue, [@Revenue], DESC )\nRETURN\n    DIVIDE ( SUMX ( TopCategories, [@Revenue] ), SUMX ( CategoryRevenue, [@Revenue] ) )",
+            "formatString": "0.0%",
+            "displayFolder": "Categories"
+          },
+          {
+            "name": "Active Sellers",
+            "expression": "DISTINCTCOUNT ( fact_sales[seller_id] )",
+            "formatString": "#,0",
+            "displayFolder": "Sellers"
+          },
+          {
+            "name": "Top Sellers Share",
+            "expression": "VAR SellerPercent =\n    MAX ( report_settings[top_sellers_percent] )\nVAR SellerRevenue =\n    ADDCOLUMNS (\n        SUMMARIZE ( fact_sales, dim_seller[seller_id] ),\n        \"@Revenue\", [Revenue]\n    )\nVAR SellersInTop =\n    ROUNDUP ( COUNTROWS ( SellerRevenue ) * SellerPercent / 100, 0 )\nVAR TopSellers =\n    TOPN ( SellersInTop, SellerRevenue, [@Revenue], DESC )\nRETURN\n    DIVIDE ( SUMX ( TopSellers, [@Revenue] ), SUMX ( SellerRevenue, [@Revenue] ) )",
+            "formatString": "0.0%",
+            "displayFolder": "Sellers"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "40c691cc-8ce7-4126-8b31-08e2f6f6d24f",
+        "fromTable": "fact_sales",
+        "fromColumn": "order_date",
+        "toTable": "dim_date",
+        "toColumn": "Date"
+      },
+      {
+        "name": "974105f4-0769-4a54-87d2-301d22d2ed9a",
+        "fromTable": "fact_sales",
+        "fromColumn": "product_id",
+        "toTable": "dim_product",
+        "toColumn": "product_id"
+      },
+      {
+        "name": "8ba5a373-d23e-48e6-8902-5cb5267a45ac",
+        "fromTable": "fact_sales",
+        "fromColumn": "seller_id",
+        "toTable": "dim_seller",
+        "toColumn": "seller_id"
+      },
+      {
+        "name": "0811747e-9129-43ba-b1f2-0d9cfd1d607b",
+        "fromTable": "fact_sales",
+        "fromColumn": "customer_id",
+        "toTable": "dim_customer",
+        "toColumn": "customer_id"
+      }
+    ],
+    "roles": [
+      {
+        "name": "Seller region - Center-West",
+        "modelPermission": "read",
+        "tablePermissions": [
+          {
+            "name": "dim_seller",
+            "filterExpression": "[seller_region] = \"Center-West\""
+          }
+        ]
+      },
+      {
+        "name": "Seller region - North",
+        "modelPermission": "read",
+        "tablePermissions": [
+          {
+            "name": "dim_seller",
+            "filterExpression": "[seller_region] = \"North\""
+          }
+        ]
+      },
+      {
+        "name": "Seller region - Northeast",
+        "modelPermission": "read",
+        "tablePermissions": [
+          {
+            "name": "dim_seller",
+            "filterExpression": "[seller_region] = \"Northeast\""
+          }
+        ]
+      },
+      {
+        "name": "Seller region - South",
+        "modelPermission": "read",
+        "tablePermissions": [
+          {
+            "name": "dim_seller",
+            "filterExpression": "[seller_region] = \"South\""
+          }
+        ]
+      },
+      {
+        "name": "Seller region - Southeast",
+        "modelPermission": "read",
+        "tablePermissions": [
+          {
+            "name": "dim_seller",
+            "filterExpression": "[seller_region] = \"Southeast\""
+          }
+        ]
+      }
+    ],
+    "annotations": [
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      },
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"OutputFolder\", \"fact_sales\", \"dim_product\", \"dim_seller\", \"dim_customer\", \"report_settings\", \"_Measures\"]"
+      }
+    ]
+  }
+}
