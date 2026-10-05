@@ -1,6 +1,14 @@
-# Sales performance dashboard
+<p align="center">
+  <img width="100%" src="docs/header.svg" alt="Sales performance dashboard: 96,478 orders. Orders that arrived late scored 2.27 stars against 4.29 on time, and the top 10% of sellers brought 67% of revenue.">
+</p>
 
-**96,478 orders: orders that arrived late scored 2.27 stars against 4.29 on time, and the top 10% of sellers brought 67% of revenue.**
+<p align="center">
+  <img src="https://img.shields.io/badge/Power_BI-DAX_%26_Power_Query-F2C811?style=for-the-badge&logo=powerbi&logoColor=black" alt="Power BI, DAX and Power Query">
+  <img src="https://img.shields.io/badge/Python-pandas-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python and pandas">
+  <img src="https://img.shields.io/badge/DuckDB-Star_schema-FFF000?style=for-the-badge&logo=duckdb&logoColor=black" alt="DuckDB star schema">
+</p>
+
+<h3 align="center">96,478 orders: orders that arrived late scored 2.27 stars against 4.29 on time,<br>and the top 10% of sellers brought 67% of revenue.</h3>
 
 A Power BI report built end to end, with no database: one Python notebook checks and cleans the input files and
 writes a star schema, and Power BI adds 23 DAX measures, five pages and row-level security by region. The notebook
@@ -20,7 +28,7 @@ reviews come out as separate exports, so nobody can answer on one page:
 
 Every report starts with a day of cleaning, and the totals never agree.
 
-## The solution
+## 🛠️ The solution
 
 ![How it works](docs/how-it-works.svg)
 
@@ -29,7 +37,7 @@ dimension answers one of them; the fact table in the middle answers the last.
 
 ![Five questions, one star](docs/mental-model.svg)
 
-## What the numbers say
+## 📈 What the numbers say
 
 | | |
 |---|---|
@@ -57,7 +65,7 @@ What a manager does with it:
 
 These are patterns in the data, not proven causes: the report shows where to look.
 
-## The report
+## 📊 The report
 
 | Page | Question it answers |
 |---|---|
@@ -74,7 +82,7 @@ The report is [`powerbi/sales-performance.pbip`](powerbi/README.md): open it in 
 also lets you build it by hand: every Power Query step, the model, every measure, every visual with its position and
 fields, the theme, and the numbers each page must show. All 43 checks were run against the model in Power BI Desktop.
 
-### Screenshots
+### 📸 Screenshots
 
 **Overview:** revenue, orders, customers, late deliveries and reviews at a glance.
 
@@ -96,7 +104,7 @@ fields, the theme, and the numbers each page must show. All 43 checks were run a
 
 ![Delivery page](powerbi/screenshots/05-delivery.png)
 
-## How the numbers are checked
+## 🔍 How the numbers are checked
 
 - [`analysis/analysis.ipynb`](analysis/analysis.ipynb) is the source of truth. It applies the rules once, from
   `config/client.yaml`, stops on broken keys or missing lookups, writes the tables Power BI reads, and computes
@@ -110,7 +118,7 @@ Rules for the demo (keys in `config/client.yaml`): a sale is an item of a delive
 price, with freight shown on its own; an order is late when it arrives after the estimated date (dates only); each
 order keeps its latest review.
 
-## Run it
+## ▶️ Run it
 
 ```bash
 pip install -r requirements.txt
@@ -145,7 +153,7 @@ docs/                the diagrams and charts used here
 powerbi/             the report (.pbip) and build_pbip.py, the step-by-step build, the theme, the checks, the screenshots
 ```
 
-## Data
+## 🗂️ Data
 
 The [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 on Kaggle: about 100,000 orders placed on the Olist marketplace from 2016 to 2018, licensed CC BY-NC-SA 4.0.
