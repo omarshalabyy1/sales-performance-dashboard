@@ -165,6 +165,16 @@ docs/                the diagrams and charts used here
 powerbi/             the report (.pbip) and build_pbip.py, the step-by-step build, the theme, the checks, the screenshots
 ```
 
+## 🏗️ For engineers
+
+Every table, the tables it is built from, and its row count after one run:
+
+![Data flow, table by table](docs/data-flow.svg)
+
+The star schema Power BI builds from the files in `output/`:
+
+![The star schema](docs/data-model.svg)
+
 ## 🗂️ Data
 
 The [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)

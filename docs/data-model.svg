@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 707" width="1000" height="707" role="img" aria-label="Star schema: fact_sales (110,197 rows, one per order item, key order_id plus item_no) joins four dimensions, many to one, each filtering one way into the fact: dim_date (1,096 days, built in DAX) on order_date, dim_product (32,951 rows) on product_id, dim_seller (3,095 rows) on seller_id and dim_customer (99,441 rows) on customer_id. report_settings (1 row, the top-N values) and _Measures (23 measures) stand apart. Row-level security filters dim_seller by region.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1220"/>
+      <stop offset="0.55" stop-color="#10213A"/>
+      <stop offset="1" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#64748B"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: "Segoe UI", -apple-system, Helvetica, Arial, sans-serif; }
+    .title { font-size: 21px; font-weight: 700; fill: #FFFFFF; }
+    .sub { font-size: 13.5px; fill: #CBD5E1; }
+    .layer { font-size: 14px; font-weight: 700; fill: #0B1220; }
+    .where { font-size: 12px; fill: #94A3B8; }
+    .name { font-size: 13px; fill: #F1F5F9; }
+    .count { font-size: 11.5px; fill: #94A3B8; }
+    .note { font-size: 12px; fill: #CBD5E1; }
+    .col { font-size: 12.5px; fill: #E2E8F0; }
+    .key { font-size: 11px; font-weight: 700; }
+    .edge { fill: none; stroke: #64748B; stroke-width: 1.4; }
+  </style>
+  <rect width="1000" height="707" rx="22" fill="url(#bg)"/>
+  <text x="40" y="50" class="title">The star schema</text>
+  <text x="40" y="74" class="sub">One fact row per order item, four dimensions around it. Every join is many to one, on a single key, filtering one way.</text>
+  <path d="M370 236.5 C325.0 236.5 325.0 167.5 280 167.5" class="edge" stroke="#94A3B8"/>
+  <text x="360" y="231.5" class="key" fill="#CBD5E1" text-anchor="end">*</text><text x="288" y="162.5" class="key" fill="#CBD5E1" text-anchor="start">1</text>
+  <path d="M370 259.5 C325.0 259.5 325.0 307.5 280 307.5" class="edge" stroke="#94A3B8"/>
+  <text x="360" y="254.5" class="key" fill="#CBD5E1" text-anchor="end">*</text><text x="288" y="302.5" class="key" fill="#CBD5E1" text-anchor="start">1</text>
+  <path d="M630 282.5 C675.0 282.5 675.0 402.5 720 402.5" class="edge" stroke="#94A3B8"/>
+  <text x="640" y="277.5" class="key" fill="#CBD5E1" text-anchor="start">*</text><text x="712" y="397.5" class="key" fill="#CBD5E1" text-anchor="end">1</text>
+  <path d="M630 213.5 C675.0 213.5 675.0 167.5 720 167.5" class="edge" stroke="#94A3B8"/>
+  <text x="640" y="208.5" class="key" fill="#CBD5E1" text-anchor="start">*</text><text x="712" y="162.5" class="key" fill="#CBD5E1" text-anchor="end">1</text>
+  <rect x="370" y="110" width="260" height="307" rx="10" fill="#13233D" stroke="#2563EB" stroke-width="1.5"/>
+  <path d="M370 120 a10 10 0 0 1 10 -10 h240 a10 10 0 0 1 10 10 v36 h-260 Z" fill="#2563EB"/>
+  <text x="382" y="130" class="name" font-weight="700" style="fill:#FFFFFF">fact_sales</text><text x="382" y="147" class="count" style="fill:#FFFFFF">110,197 rows</text>
+  <text x="382" y="172" class="col">order_id</text><text x="618" y="172" class="key" fill="#FBBF24" text-anchor="end">PK</text>
+  <text x="382" y="195" class="col">item_no</text><text x="618" y="195" class="key" fill="#FBBF24" text-anchor="end">PK</text>
+  <text x="382" y="218" class="col">order_date</text><text x="618" y="218" class="key" fill="#93C5FD" text-anchor="end">FK</text>
+  <text x="382" y="241" class="col">product_id</text><text x="618" y="241" class="key" fill="#93C5FD" text-anchor="end">FK</text>
+  <text x="382" y="264" class="col">seller_id</text><text x="618" y="264" class="key" fill="#93C5FD" text-anchor="end">FK</text>
+  <text x="382" y="287" class="col">customer_id</text><text x="618" y="287" class="key" fill="#93C5FD" text-anchor="end">FK</text>
+  <text x="382" y="310" class="col">price</text>
+  <text x="382" y="333" class="col">freight</text>
+  <text x="382" y="356" class="col">delivery_days</text>
+  <text x="382" y="379" class="col">delivery_status</text>
+  <text x="382" y="402" class="col">review_score</text>
+  <rect x="40" y="110" width="240" height="100" rx="10" fill="#13233D" stroke="#14B8A6" stroke-width="1.5"/>
+  <path d="M40 120 a10 10 0 0 1 10 -10 h220 a10 10 0 0 1 10 10 v36 h-240 Z" fill="#14B8A6"/>
+  <text x="52" y="130" class="name" font-weight="700" style="fill:#0B1220">dim_product</text><text x="52" y="147" class="count" style="fill:#0B1220">32,951 rows</text>
+  <text x="52" y="172" class="col">product_id</text><text x="268" y="172" class="key" fill="#FBBF24" text-anchor="end">PK</text>
+  <text x="52" y="195" class="col">category</text>
+  <rect x="40" y="250" width="240" height="169" rx="10" fill="#13233D" stroke="#14B8A6" stroke-width="1.5"/>
+  <path d="M40 260 a10 10 0 0 1 10 -10 h220 a10 10 0 0 1 10 10 v36 h-240 Z" fill="#14B8A6"/>
+  <text x="52" y="270" class="name" font-weight="700" style="fill:#0B1220">dim_seller</text><text x="52" y="287" class="count" style="fill:#0B1220">3,095 rows</text>
+  <text x="52" y="312" class="col">seller_id</text><text x="268" y="312" class="key" fill="#FBBF24" text-anchor="end">PK</text>
+  <text x="52" y="335" class="col">seller_city</text>
+  <text x="52" y="358" class="col">seller_state</text>
+  <text x="52" y="381" class="col">seller_region</text>
+  <text x="52" y="404" class="col">seller_short_id</text>
+  <rect x="720" y="110" width="240" height="215" rx="10" fill="#13233D" stroke="#14B8A6" stroke-width="1.5"/>
+  <path d="M720 120 a10 10 0 0 1 10 -10 h220 a10 10 0 0 1 10 10 v36 h-240 Z" fill="#14B8A6"/>
+  <text x="732" y="130" class="name" font-weight="700" style="fill:#0B1220">dim_date</text><text x="732" y="147" class="count" style="fill:#0B1220">1,096 days, DAX table</text>
+  <text x="732" y="172" class="col">Date</text><text x="948" y="172" class="key" fill="#FBBF24" text-anchor="end">PK</text>
+  <text x="732" y="195" class="col">Year</text>
+  <text x="732" y="218" class="col">Month Number</text>
+  <text x="732" y="241" class="col">Month</text>
+  <text x="732" y="264" class="col">Year Month</text>
+  <text x="732" y="287" class="col">Year Month Number</text>
+  <text x="732" y="310" class="col">Date With Sales</text>
+  <rect x="720" y="345" width="240" height="169" rx="10" fill="#13233D" stroke="#14B8A6" stroke-width="1.5"/>
+  <path d="M720 355 a10 10 0 0 1 10 -10 h220 a10 10 0 0 1 10 10 v36 h-240 Z" fill="#14B8A6"/>
+  <text x="732" y="365" class="name" font-weight="700" style="fill:#0B1220">dim_customer</text><text x="732" y="382" class="count" style="fill:#0B1220">99,441 rows</text>
+  <text x="732" y="407" class="col">customer_id</text><text x="948" y="407" class="key" fill="#FBBF24" text-anchor="end">PK</text>
+  <text x="732" y="430" class="col">person_id</text>
+  <text x="732" y="453" class="col">customer_city</text>
+  <text x="732" y="476" class="col">customer_state</text>
+  <text x="732" y="499" class="col">customer_region</text>
+  <rect x="40" y="545" width="240" height="100" rx="10" fill="#13233D" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M40 555 a10 10 0 0 1 10 -10 h220 a10 10 0 0 1 10 10 v36 h-240 Z" fill="#94A3B8"/>
+  <text x="52" y="565" class="name" font-weight="700" style="fill:#0B1220">report_settings</text><text x="52" y="582" class="count" style="fill:#0B1220">1 row, hidden, no relationship</text>
+  <text x="52" y="607" class="col">top_categories</text>
+  <text x="52" y="630" class="col">top_sellers_percent</text>
+  <rect x="370" y="545" width="260" height="100" rx="10" fill="#13233D" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M370 555 a10 10 0 0 1 10 -10 h240 a10 10 0 0 1 10 10 v36 h-260 Z" fill="#94A3B8"/>
+  <text x="382" y="565" class="name" font-weight="700" style="fill:#0B1220">_Measures</text><text x="382" y="582" class="count" style="fill:#0B1220">23 measures, in 6 display folders</text>
+  <text x="382" y="607" class="col">Sales · Orders and customers</text>
+  <text x="382" y="630" class="col">Delivery · Reviews · Categories · Sellers</text>
+  <text x="40" y="683" class="where">PK primary key · FK foreign key · 1 to * one dimension row to many fact rows · security roles filter dim_seller[seller_region]</text>
+</svg>
