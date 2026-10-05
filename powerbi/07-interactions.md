@@ -19,11 +19,11 @@ Slicers filter every visual on their page (default, nothing to set) and are left
 
 ## Overview
 
-| Click on ↓ / affects → | Revenue by month | Revenue by customer region | Top 10 categories | Average review, on time against late | Cards |
+| Click on ↓ / affects → | Revenue by month | Revenue by customer region | Top categories | Average review, on time against late | Cards |
 |---|---|---|---|---|---|
 | Revenue by month | | Filter | Filter | Filter | Filter |
 | Revenue by customer region | Filter | | Filter | Filter | Filter |
-| Top 10 categories by revenue | Filter | Filter | | Filter | Filter |
+| Top categories by revenue | Filter | Filter | | Filter | Filter |
 | Average review, on time against late | **None** | **None** | **None** | | **None** |
 
 Why None: that chart shows two measures, not a category, so a click on it has nothing to filter by.

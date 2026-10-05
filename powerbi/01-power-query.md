@@ -1,17 +1,19 @@
 # 1. Power Query
 
-Seven queries: one parameter, two staging queries that stay out of the model, and four tables that load.
-The rules match the notebook exactly (`analysis/analysis.ipynb`, section 3).
+Power BI reads the model tables the notebook writes to `output/`. The rules (which orders are sales, when an order
+is late, which review counts, the regions) are applied once, in the notebook, from `config/client.yaml`; Power
+Query only reads the files and sets the types. Run the notebook first (`08-build-checklist.md`, steps 1 to 4).
+
+Six queries: one parameter and five tables that load.
 
 | Query | Loads to the model | What it is |
 |---|---|---|
-| `DataFolder` | No | The folder that holds the CSV files |
-| `stg_orders` | No | Delivered orders with dates, delivery days and on time / late |
-| `stg_reviews` | No | The latest review of each order |
+| `OutputFolder` | No | The folder that holds the notebook's output files |
 | `fact_sales` | Yes | One row per order item, the fact table |
 | `dim_product` | Yes | One row per product, with its category |
 | `dim_seller` | Yes | One row per seller, with state and region |
 | `dim_customer` | Yes | One row per customer address, with state and region |
+| `report_settings` | Yes (hidden) | One row: `report.top_categories` and `report.top_sellers_percent` from the config, read by two measures |
 
 ## Before you start
 
@@ -20,267 +22,152 @@ The rules match the notebook exactly (`analysis/analysis.ipynb`, section 3).
 2. **Home → Transform data** opens Power Query.
 3. For every query below: **Home → New source → Blank query**, rename it (right-click → Rename) to the name in the
    heading, then **Home → Advanced editor**, select all, paste the code block, **Done**.
-4. For the two staging queries: right-click the query → untick **Enable load**. They turn italic.
 
-Every file is read as UTF-8 (`Encoding = 65001`) so accented city names stay correct, and with
-`QuoteStyle.Csv` so review texts that contain line breaks do not split rows. Types are set with the `en-US` culture
-so `58.90` is read as fifty-eight point nine on any Windows language setting.
+Every file is read as UTF-8 (`Encoding = 65001`) so accented city names stay correct, and types are set with the
+`en-US` culture because the notebook writes dates as `YYYY-MM-DD` and decimals with a dot.
 
-## DataFolder (parameter)
+## OutputFolder (parameter)
 
-**Home → Manage parameters → New parameter**: name `DataFolder`, type **Text**, current value = the full path of
-this repo's `data\raw\` folder, ending with a backslash. Or paste this in a blank query and change the path:
+**Home → Manage parameters → New parameter**: name `OutputFolder`, type **Text**, current value = the full path of
+this repo's `output\` folder, ending with a backslash. Or paste this in a blank query and change the path:
 
 ```m
-"C:\Users\you\GitHub\sales-performance-dashboard\data\raw\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+"C:\Users\you\GitHub\sales-performance-dashboard\output\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
 ```
-
-## stg_orders (staging, do not load)
-
-Keeps delivered orders only. The order date is the purchase date without the time. `delivery_days` counts whole days
-from purchase to delivery. An order is late when the delivery date is after the estimated date (dates only). Eight
-delivered orders have no delivery date: they stay in the sales with `delivery_status = "No date"`.
-
-```m
-let
-    Source = Csv.Document(
-        File.Contents(DataFolder & "olist_orders_dataset.csv"),
-        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-    ),
-    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-    Delivered = Table.SelectRows(PromotedHeaders, each [order_status] = "delivered"),
-    ChangedType = Table.TransformColumnTypes(
-        Delivered,
-        {
-            {"order_id", type text},
-            {"customer_id", type text},
-            {"order_purchase_timestamp", type datetime},
-            {"order_delivered_customer_date", type datetime},
-            {"order_estimated_delivery_date", type datetime}
-        },
-        "en-US"
-    ),
-    AddedOrderDate = Table.AddColumn(ChangedType, "order_date", each Date.From([order_purchase_timestamp]), type date),
-    AddedDeliveryDays = Table.AddColumn(
-        AddedOrderDate,
-        "delivery_days",
-        each if [order_delivered_customer_date] = null then null
-            else Duration.Days(Date.From([order_delivered_customer_date]) - [order_date]),
-        Int64.Type
-    ),
-    AddedDeliveryStatus = Table.AddColumn(
-        AddedDeliveryDays,
-        "delivery_status",
-        each if [order_delivered_customer_date] = null then "No date"
-            else if Date.From([order_delivered_customer_date]) > Date.From([order_estimated_delivery_date]) then "Late"
-            else "On time",
-        type text
-    ),
-    Kept = Table.SelectColumns(AddedDeliveryStatus, {"order_id", "customer_id", "order_date", "delivery_days", "delivery_status"})
-in
-    Kept
-```
-
-Expected: **96,478 rows**.
-
-## stg_reviews (staging, do not load)
-
-Some orders were reviewed twice. `Table.Max` keeps the row answered last, so each order has one score.
-
-```m
-let
-    Source = Csv.Document(
-        File.Contents(DataFolder & "olist_order_reviews_dataset.csv"),
-        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-    ),
-    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-    Kept = Table.SelectColumns(PromotedHeaders, {"order_id", "review_score", "review_answer_timestamp"}),
-    ChangedType = Table.TransformColumnTypes(
-        Kept,
-        {{"order_id", type text}, {"review_score", Int64.Type}, {"review_answer_timestamp", type datetime}},
-        "en-US"
-    ),
-    LatestPerOrder = Table.Group(
-        ChangedType,
-        {"order_id"},
-        {{"review_score", each Table.Max(_, "review_answer_timestamp")[review_score], Int64.Type}}
-    )
-in
-    LatestPerOrder
-```
-
-Expected: **98,673 rows** (one per reviewed order, all statuses).
 
 ## fact_sales (load)
 
-Grain: **one row per order item** (`order_id` + `order_item_id`). The inner join to `stg_orders` drops items of
-orders that were not delivered. Order-level columns (`delivery_days`, `delivery_status`, `review_score`) repeat on
-every item of the same order; the measures count them once per order.
+Grain: **one row per order item** (`order_id` + `item_no`). Order-level columns (`delivery_days`,
+`delivery_status`, `review_score`) repeat on every item of the same order; the measures count them once per order.
 
 ```m
 let
     Source = Csv.Document(
-        File.Contents(DataFolder & "olist_order_items_dataset.csv"),
+        File.Contents(OutputFolder & "fact_sales.csv"),
         [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
     ),
     PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-    Kept = Table.SelectColumns(PromotedHeaders, {"order_id", "order_item_id", "product_id", "seller_id", "price", "freight_value"}),
     ChangedType = Table.TransformColumnTypes(
-        Kept,
+        PromotedHeaders,
         {
             {"order_id", type text},
-            {"order_item_id", Int64.Type},
+            {"item_no", Int64.Type},
+            {"order_date", type date},
             {"product_id", type text},
             {"seller_id", type text},
-            {"price", Currency.Type},
-            {"freight_value", Currency.Type}
-        },
-        "en-US"
-    ),
-    JoinedOrders = Table.NestedJoin(ChangedType, {"order_id"}, stg_orders, {"order_id"}, "order", JoinKind.Inner),
-    ExpandedOrders = Table.ExpandTableColumn(JoinedOrders, "order", {"customer_id", "order_date", "delivery_days", "delivery_status"}),
-    JoinedReviews = Table.NestedJoin(ExpandedOrders, {"order_id"}, stg_reviews, {"order_id"}, "review", JoinKind.LeftOuter),
-    ExpandedReviews = Table.ExpandTableColumn(JoinedReviews, "review", {"review_score"}),
-    Typed = Table.TransformColumnTypes(
-        ExpandedReviews,
-        {
             {"customer_id", type text},
-            {"order_date", type date},
+            {"price", Currency.Type},
+            {"freight", Currency.Type},
             {"delivery_days", Int64.Type},
             {"delivery_status", type text},
             {"review_score", Int64.Type}
-        }
+        },
+        "en-US"
     )
 in
-    Typed
+    ChangedType
 ```
-
-Expected: **110,197 rows**.
 
 ## dim_product (load)
 
-Grain: one row per product. The category is the English name, with underscores turned into spaces. Two categories
-have no English name, so they keep the Portuguese one; 610 products have no category and get `unknown`.
-
 ```m
 let
     Source = Csv.Document(
-        File.Contents(DataFolder & "olist_products_dataset.csv"),
+        File.Contents(OutputFolder & "dim_product.csv"),
         [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
     ),
     PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-    Kept = Table.SelectColumns(PromotedHeaders, {"product_id", "product_category_name"}),
-    Names = Table.PromoteHeaders(
-        Csv.Document(
-            File.Contents(DataFolder & "product_category_name_translation.csv"),
-            [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-        ),
-        [PromoteAllScalars = true]
-    ),
-    JoinedNames = Table.NestedJoin(Kept, {"product_category_name"}, Names, {"product_category_name"}, "names", JoinKind.LeftOuter),
-    ExpandedNames = Table.ExpandTableColumn(JoinedNames, "names", {"product_category_name_english"}),
-    AddedCategory = Table.AddColumn(
-        ExpandedNames,
-        "category",
-        each Text.Replace(
-            if [product_category_name_english] <> null then [product_category_name_english]
-            else if [product_category_name] <> "" then [product_category_name]
-            else "unknown",
-            "_",
-            " "
-        ),
-        type text
-    ),
-    Final = Table.TransformColumnTypes(Table.SelectColumns(AddedCategory, {"product_id", "category"}), {{"product_id", type text}})
+    ChangedType = Table.TransformColumnTypes(PromotedHeaders, {{"product_id", type text}, {"category", type text}}, "en-US")
 in
-    Final
+    ChangedType
 ```
-
-Expected: **32,951 rows**.
 
 ## dim_seller (load)
 
-Grain: one row per seller. The region follows Brazil's five official regions; it drives the row-level security.
-`seller_short_id` is the first 8 characters of the id, unique for every seller, used as the label in tables.
-
 ```m
 let
     Source = Csv.Document(
-        File.Contents(DataFolder & "olist_sellers_dataset.csv"),
+        File.Contents(OutputFolder & "dim_seller.csv"),
         [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
     ),
     PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-    Kept = Table.SelectColumns(PromotedHeaders, {"seller_id", "seller_city", "seller_state"}),
-    ChangedType = Table.TransformColumnTypes(Kept, {{"seller_id", type text}, {"seller_city", type text}, {"seller_state", type text}}),
-    AddedRegion = Table.AddColumn(
-        ChangedType,
-        "seller_region",
-        each if List.Contains({"AC", "AP", "AM", "PA", "RO", "RR", "TO"}, [seller_state]) then "North"
-            else if List.Contains({"AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"}, [seller_state]) then "Northeast"
-            else if List.Contains({"DF", "GO", "MT", "MS"}, [seller_state]) then "Center-West"
-            else if List.Contains({"ES", "MG", "RJ", "SP"}, [seller_state]) then "Southeast"
-            else if List.Contains({"PR", "RS", "SC"}, [seller_state]) then "South"
-            else "Unknown",
-        type text
-    ),
-    AddedShortId = Table.AddColumn(AddedRegion, "seller_short_id", each Text.Start([seller_id], 8), type text)
+    ChangedType = Table.TransformColumnTypes(
+        PromotedHeaders,
+        {
+            {"seller_id", type text},
+            {"seller_city", type text},
+            {"seller_state", type text},
+            {"seller_region", type text},
+            {"seller_short_id", type text}
+        },
+        "en-US"
+    )
 in
-    AddedShortId
+    ChangedType
 ```
-
-Expected: **3,095 rows**, no `Unknown` region.
 
 ## dim_customer (load)
 
-Grain: one row per `customer_id`. In this data a `customer_id` is one order's delivery address; the same person
-keeps one `customer_unique_id` across orders, so **Customers** counts `customer_unique_id`.
+`customer_id` is one order's delivery address; `person_id` is the same person across orders, so **Customers**
+counts `person_id`.
 
 ```m
 let
     Source = Csv.Document(
-        File.Contents(DataFolder & "olist_customers_dataset.csv"),
+        File.Contents(OutputFolder & "dim_customer.csv"),
         [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
     ),
     PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-    Kept = Table.SelectColumns(PromotedHeaders, {"customer_id", "customer_unique_id", "customer_city", "customer_state"}),
     ChangedType = Table.TransformColumnTypes(
-        Kept,
-        {{"customer_id", type text}, {"customer_unique_id", type text}, {"customer_city", type text}, {"customer_state", type text}}
-    ),
-    AddedRegion = Table.AddColumn(
-        ChangedType,
-        "customer_region",
-        each if List.Contains({"AC", "AP", "AM", "PA", "RO", "RR", "TO"}, [customer_state]) then "North"
-            else if List.Contains({"AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"}, [customer_state]) then "Northeast"
-            else if List.Contains({"DF", "GO", "MT", "MS"}, [customer_state]) then "Center-West"
-            else if List.Contains({"ES", "MG", "RJ", "SP"}, [customer_state]) then "Southeast"
-            else if List.Contains({"PR", "RS", "SC"}, [customer_state]) then "South"
-            else "Unknown",
-        type text
+        PromotedHeaders,
+        {
+            {"customer_id", type text},
+            {"person_id", type text},
+            {"customer_city", type text},
+            {"customer_state", type text},
+            {"customer_region", type text}
+        },
+        "en-US"
     )
 in
-    AddedRegion
+    ChangedType
 ```
 
-Expected: **99,441 rows**, no `Unknown` region.
+## report_settings (load, hidden)
+
+One row with the two top-N values from `config/client.yaml`, so the DAX never holds a client number.
+
+```m
+let
+    Source = Csv.Document(
+        File.Contents(OutputFolder & "report_settings.csv"),
+        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+    ),
+    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+    ChangedType = Table.TransformColumnTypes(
+        PromotedHeaders,
+        {{"top_categories", Int64.Type}, {"top_sellers_percent", Int64.Type}},
+        "en-US"
+    )
+in
+    ChangedType
+```
 
 ## Columns that load
-
-What each loaded table must contain after **Close & apply** (no renames anywhere: the names are the source names).
 
 | Table | Column | Type |
 |---|---|---|
 | `fact_sales` | `order_id` | Text |
-| | `order_item_id` | Whole number |
+| | `item_no` | Whole number |
+| | `order_date` | Date |
 | | `product_id` | Text |
 | | `seller_id` | Text |
-| | `price` | Fixed decimal number |
-| | `freight_value` | Fixed decimal number |
 | | `customer_id` | Text |
-| | `order_date` | Date |
-| | `delivery_days` | Whole number |
+| | `price` | Fixed decimal number |
+| | `freight` | Fixed decimal number |
+| | `delivery_days` | Whole number (blank when there is no delivery date) |
 | | `delivery_status` | Text (`On time`, `Late`, `No date`) |
-| | `review_score` | Whole number (1 to 5, blank when no review) |
+| | `review_score` | Whole number (blank when there is no review) |
 | `dim_product` | `product_id` | Text |
 | | `category` | Text |
 | `dim_seller` | `seller_id` | Text |
@@ -289,12 +176,14 @@ What each loaded table must contain after **Close & apply** (no renames anywhere
 | | `seller_region` | Text |
 | | `seller_short_id` | Text |
 | `dim_customer` | `customer_id` | Text |
-| | `customer_unique_id` | Text |
+| | `person_id` | Text |
 | | `customer_city` | Text |
 | | `customer_state` | Text |
 | | `customer_region` | Text |
+| `report_settings` | `top_categories` | Whole number |
+| | `top_sellers_percent` | Whole number |
 
 ## Finish
 
 **Home → Close & apply.** Then check the row counts in the Data view (bottom left shows the row count of the
-selected table). If any count differs from the ones above, stop and compare that query with this file.
+selected table) against `06-checks.md` (C1, C3, C4, C5): they must equal the notebook's section 3.

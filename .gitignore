@@ -1,4 +1,5 @@
-data/raw/*
-!data/raw/.gitkeep
+data/input/*.csv
+!data/input/regions.csv
+output/
 .ipynb_checkpoints/
 __pycache__/

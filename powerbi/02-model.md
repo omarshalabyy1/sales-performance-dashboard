@@ -18,11 +18,12 @@ filter flowing one way, from the dimension to the fact.
 
 | Table | Grain | Key | Rows |
 |---|---|---|---|
-| `fact_sales` | One order item of a delivered order | `order_id` + `order_item_id` | 110,197 |
-| `dim_date` | One day, 1 Jan 2016 to 31 Dec 2018 | `Date` | 1,096 |
-| `dim_product` | One product | `product_id` | 32,951 |
-| `dim_seller` | One seller | `seller_id` | 3,095 |
-| `dim_customer` | One customer address (`customer_id`) | `customer_id` | 99,441 |
+| `fact_sales` | One order item of a sale order (`rules.sale_statuses`) | `order_id` + `item_no` | `06-checks.md` C1 |
+| `dim_date` | One day, 1 Jan of the first order year to 31 Dec of the last | `Date` | C2 |
+| `dim_product` | One product | `product_id` | C3 |
+| `dim_seller` | One seller | `seller_id` | C4 |
+| `dim_customer` | One customer address (`customer_id`) | `customer_id` | C5 |
+| `report_settings` | One row: the top-N values from `config/client.yaml` | | 1 |
 | `_Measures` | Holds the measures, no data | | 1 |
 
 `order_id`, `delivery_status` and `review_score` stay in `fact_sales` as degenerate attributes: they describe the
@@ -49,9 +50,9 @@ RETURN
     )
 ```
 
-- Whole years (2016 to 2018), as time intelligence needs.
-- `Date With Sales` is TRUE up to the last order date (29 Aug 2018). `Revenue LY` uses it so 2018 is compared with
-  the same days of 2017, not with the whole of 2017.
+- Whole years, as time intelligence needs.
+- `Date With Sales` is TRUE up to the last order date. `Revenue LY` uses it, so when the data stops inside a year
+  (the demo stops on 29 Aug 2018) that year is compared with the same days of the year before, not the whole year.
 - **Table tools → Mark as date table → Date column: `Date`.**
 - Set the data types: `Date` = Date, `Year`, `Month Number`, `Year Month Number` = Whole number,
   `Date With Sales` = True/False.
@@ -82,10 +83,12 @@ total unambiguous.
 | Fact table at order-item grain | Revenue, category and seller exist per item; an order can hold items from several sellers |
 | Order-level columns repeated on each item | Avoids a second fact table; measures summarise to one row per order before averaging |
 | Date table in DAX, whole years | Time intelligence (`DATEADD`) needs a continuous, complete calendar |
-| `Date With Sales` flag | The data ends on 29 Aug 2018, so last year must stop on 29 Aug 2017 |
+| `Date With Sales` flag | When the data ends inside a year, last year must stop on the same day |
 | Separate `_Measures` table | All measures in one place, apart from the columns |
 | Keys and raw amounts hidden | Report users use measures, so nobody sums `price` by hand or drags an id into a chart |
-| Static roles per region | Five regions, one filter each: simpler than a user-to-region mapping table |
+| Static roles per region | One filter per region in the regions file: simpler than a user-to-region mapping table |
+| Rules applied once, in the notebook | Sales statuses, the late rule, the latest review and the regions come from `config/client.yaml`; Power Query only reads the result, so the report and the notebook cannot disagree |
+| `report_settings` table | The top-N values reach DAX from the config, so no measure holds a client number |
 
 ## Hide these columns
 
@@ -94,10 +97,11 @@ Report users pick fields from the dimensions and use the measures, so the keys a
 
 | Table | Hidden columns |
 |---|---|
-| `fact_sales` | `order_id`, `order_item_id`, `order_date`, `product_id`, `seller_id`, `customer_id`, `price`, `freight_value`, `delivery_days` |
+| `fact_sales` | `order_id`, `item_no`, `order_date`, `product_id`, `seller_id`, `customer_id`, `price`, `freight`, `delivery_days` |
 | `dim_date` | `Month Number`, `Year Month Number`, `Date With Sales` |
 | `dim_seller` | `seller_id` |
-| `dim_customer` | `customer_id`, `customer_unique_id` |
+| `dim_customer` | `customer_id`, `person_id` |
+| `report_settings` | the whole table (right-click the table → **Hide in report view**) |
 
 Visible in `fact_sales`: `delivery_status` and `review_score` only.
 
@@ -120,7 +124,7 @@ Select the column, then **Column tools**:
 | `dim_date[Year]` | Whole number, no thousands separator | Don't summarize | Shows 2018, not 2,018, and never adds years up |
 | `fact_sales[review_score]` | Whole number | Don't summarize | A score is a label on the axis, not a number to add |
 | `fact_sales[delivery_days]` | Whole number | Don't summarize | Hidden; only `Average Delivery Days` uses it |
-| `fact_sales[price]`, `fact_sales[freight_value]` | Decimal, 2 places | Sum | Hidden; only the measures use them |
+| `fact_sales[price]`, `fact_sales[freight]` | Decimal, `client.decimals` places | Sum | Hidden; only the measures use them |
 | All other columns | as loaded | Don't summarize | Text, ids and labels |
 
 Data category stays **Uncategorized** for every column: the report has no maps.
@@ -133,15 +137,12 @@ Select a measure → **Properties pane → Display folder**. The folders match t
 
 ## Row-level security
 
-Each regional manager sees only the sellers in their region. **Modeling → Manage roles → New**, five times:
+Each regional manager sees only the sellers in their region. **Modeling → Manage roles → New**, once for each
+distinct `region` in the regions file (`inputs.regions`; the demo has five, listed in `06-checks.md`):
 
 | Role | Table | DAX filter |
 |---|---|---|
-| `Seller region - North` | `dim_seller` | `[seller_region] = "North"` |
-| `Seller region - Northeast` | `dim_seller` | `[seller_region] = "Northeast"` |
-| `Seller region - Center-West` | `dim_seller` | `[seller_region] = "Center-West"` |
-| `Seller region - Southeast` | `dim_seller` | `[seller_region] = "Southeast"` |
-| `Seller region - South` | `dim_seller` | `[seller_region] = "South"` |
+| `Seller region - <region>` | `dim_seller` | `[seller_region] = "<region>"` |
 
 The filter flows from `dim_seller` to `fact_sales`, so every page shows only that region's sales. Test with
 **Modeling → View as → (role)**; the expected totals are in `06-checks.md`. After publishing, people or groups are

@@ -1,0 +1,69 @@
+# Everything a client changes. Read only through config.py (load_config).
+# A key exists here only if something reads it. There are no secrets, so there is no .env.
+
+client:
+  name: Sample marketplace            # notebook chart titles
+  currency: BRL                      # the label printed with every amount (notebook, Power BI card labels)
+  decimals: 2                        # decimals shown for amounts in the notebook
+
+inputs:                              # the files in data/input/ (columns and examples: data/input/README.md)
+  orders: olist_orders_dataset.csv
+  items: olist_order_items_dataset.csv
+  products: olist_products_dataset.csv
+  sellers: olist_sellers_dataset.csv
+  customers: olist_customers_dataset.csv
+  reviews: olist_order_reviews_dataset.csv
+  category_names: product_category_name_translation.csv
+  regions: regions.csv               # state -> region, written by us (headers: state, region)
+
+columns:                             # standard name: the header the client's file uses for it
+  orders:
+    order_id: order_id
+    customer_id: customer_id
+    status: order_status
+    purchased_at: order_purchase_timestamp
+    delivered_at: order_delivered_customer_date
+    estimated_at: order_estimated_delivery_date
+  items:
+    order_id: order_id
+    item_no: order_item_id
+    product_id: product_id
+    seller_id: seller_id
+    price: price
+    freight: freight_value
+  products:
+    product_id: product_id
+    category: product_category_name
+  sellers:
+    seller_id: seller_id
+    city: seller_city
+    state: seller_state
+  customers:
+    customer_id: customer_id
+    person_id: customer_unique_id      # the same person across orders (counts customers)
+    city: customer_city
+    state: customer_state
+  reviews:
+    order_id: order_id
+    score: review_score
+    answered_at: review_answer_timestamp
+  category_names:
+    category: product_category_name
+    name: product_category_name_english
+
+rules:
+  sale_statuses: [delivered]         # order statuses that count as a sale
+  late_after_days: 0                 # late = delivered more than this many days after the estimated date
+
+report:
+  title: Sales performance dashboard # the Power BI theme name
+  compare_year: 2018                 # the year compared with the same days of the year before (Sales page)
+  top_categories: 10                 # "top N categories" share (notebook, Power BI)
+  top_sellers_percent: 10            # "top N% of sellers" share (notebook, Power BI)
+  colours:                           # the Power BI theme (python theme.py) and the notebook charts
+    data: ["#2563EB", "#0E1630", "#8DB0FF", "#4A5675", "#1D4FD7", "#C7D7FE"]   # 1st = main series
+    text: "#0E1630"
+    muted: "#4A5675"
+    page: "#F4F6FB"
+    line: "#E2E7F1"
+    danger: "#C2410C"

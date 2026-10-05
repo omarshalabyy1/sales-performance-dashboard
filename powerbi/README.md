@@ -13,7 +13,7 @@ the notebook; `06-checks.md` lists them.
 | Sellers | Who sells, and which sellers hurt the customer experience? |
 | Delivery | How much does late delivery cost us in reviews? |
 
-Each regional manager can be limited to the sellers of their region (row-level security, five roles).
+Each regional manager can be limited to the sellers of their region (row-level security, one role per region).
 
 ## Follow the files in order
 
@@ -22,18 +22,18 @@ into the other files and says when to compare with each check in `06-checks.md`.
 
 | File | Contents |
 |---|---|
-| `01-power-query.md` | The parameter and six queries (M code), which ones load, the columns and types that load |
-| `02-model.md` | Tables and grain, the date table (DAX), relationships, design choices, hidden columns, sort orders, formats, display folders, the five security roles |
+| `01-power-query.md` | The `OutputFolder` parameter and five queries that read the notebook's output tables, the columns and types that load |
+| `02-model.md` | Tables and grain, the date table (DAX), relationships, design choices, hidden columns, sort orders, formats, display folders, one security role per region |
 | `03-measures.dax` | 23 measures with format, display folder and meaning, and which page uses each |
 | `04-pages.md` | The five pages, visual by visual: type, fields, position and size, sort, labels, conditional formatting, slicers and their sync |
-| `05-theme.json` | The theme, in the portfolio site's colours (import: View → Themes → Browse for themes) |
-| `06-checks.md` | The value every card and table must show, C1 to C43 |
+| `05-theme.json` | The theme, written by `python theme.py` from `report.title` and `report.colours` (import: View → Themes → Browse for themes) |
+| `06-checks.md` | The value every card and table must show for the demo, C1 to C43 |
 | `07-interactions.md` | The edit-interactions matrix per page, filters, and why there is no drill-through or bookmark |
-| `08-build-checklist.md` | The 45 steps, with the checks to make at each point |
+| `08-build-checklist.md` | The 47 steps, from the input files to the last screenshot, with the checks to make at each point |
 
 The report is saved here as `sales-performance.pbix`, with one screenshot per page in `screenshots/`.
 
 ## Needs
 
 - Power BI Desktop (free).
-- The seven CSV files in `data/raw/` (see the main README, "Data").
+- The input files in `data/input/` and the notebook run once (steps 1 to 4 of `08-build-checklist.md`).

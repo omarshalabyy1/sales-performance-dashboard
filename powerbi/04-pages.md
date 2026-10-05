@@ -36,7 +36,7 @@ Refer to colours by their theme slot, as the colour picker shows them after the 
 | Title | 24 | 16 | 760 | 48 | Text box: page title in Segoe UI Semibold 20, **theme colour 2**; the subtitle under it in Segoe UI 11, **theme colour 4** |
 | Year slicer | 816 | 16 | 210 | 56 | `dim_date[Year]`, style **Dropdown**, title "Year"; **Selection**: single select off, multi-select with Ctrl on, "Select all" option on |
 | Region slicer | 1046 | 16 | 210 | 56 | `dim_customer[customer_region]`, style **Dropdown**, title "Customer region"; **Selection**: single select off, multi-select with Ctrl on, "Select all" option on |
-| Cards row | 24 | 80 | (per page) | 96 | One **Card** per measure, the measure's name as the label; callout value in the measure's own format |
+| Cards row | 24 | 80 | (per page) | 96 | One **Card** per measure, the label given on each page; an amount's label ends with `client.currency` from `config/client.yaml` (demo: "Revenue, BRL"); callout value in the measure's own format |
 | Charts | 24 to 1256 | 192 to 704 | | | Per page, below |
 
 **Every chart:** the title is the quoted name in its row, title on; legend off unless the row names two series;
@@ -53,13 +53,13 @@ fields on the chart) unless the row lists extra tooltip fields.
 The Sales page has its own single-select Year slicer, because "against last year" needs exactly one year.
 
 **Interactions, filters, drill-through and bookmarks:** see `07-interactions.md`. Leave the slicers cleared
-("All") when you save, except the Sales page Year slicer, which stays on **2018**.
+("All") when you save, except the Sales page Year slicer, which stays on `report.compare_year` (demo 2018).
 
 ---
 
 ## Page 1: Overview
 
-Title "Sales overview", subtitle "Delivered orders, Sep 2016 to Aug 2018".
+Title "Sales overview", subtitle "Orders that count as sales".
 
 **Cards** (w 196, h 96, y 80):
 
@@ -78,7 +78,7 @@ Title "Sales overview", subtitle "Delivered orders, Sep 2016 to Aug 2018".
 |---|---|---|---|---|---|---|
 | Line chart, "Revenue by month" | 24 | 192 | 808 | 248 | X-axis `dim_date[Year Month]`, Y-axis `Revenue` | X-axis type **Categorical**; sort axis by `Year Month`, ascending; no markers, no data labels |
 | Clustered bar chart, "Revenue by customer region" | 848 | 192 | 402 | 248 | Y-axis `dim_customer[customer_region]`, X-axis `Revenue` | Sort by `Revenue`, descending; data labels on, Millions, 1 decimal |
-| Clustered bar chart, "Top 10 categories by revenue" | 24 | 456 | 808 | 248 | Y-axis `dim_product[category]`, X-axis `Revenue` | Filter on this visual: `category` → **Top N**, Top 10 by `Revenue`; sort by `Revenue`, descending; data labels on, Millions, 2 decimals |
+| Clustered bar chart, "Top categories by revenue" | 24 | 456 | 808 | 248 | Y-axis `dim_product[category]`, X-axis `Revenue` | Filter on this visual: `category` → **Top N**, Top `report.top_categories` (demo 10) by `Revenue`; sort by `Revenue`, descending; data labels on, Millions, 2 decimals |
 | Clustered column chart, "Average review, on time against late" | 848 | 456 | 402 | 248 | Y-axis `Average Review On Time`, `Average Review Late` (no X-axis field) | Y-axis 0 to 5; data labels on, 2 decimals; colours: On time **theme colour 1**, Late **danger** |
 
 ---
@@ -88,7 +88,7 @@ Title "Sales overview", subtitle "Delivered orders, Sep 2016 to Aug 2018".
 Title "Sales against last year", subtitle "Last year = the same days one year earlier".
 
 **Year slicer** (this page only, not synced): x 816, y 16, w 210, h 56, field `dim_date[Year]`, style
-**Dropdown**, **Selection → Single select on**, select **2018**.
+**Dropdown**, **Selection → Single select on**, select the year in `report.compare_year` (demo **2018**).
 
 **Cards** (w 196, h 96, y 80):
 
@@ -122,7 +122,7 @@ Title "What sells", subtitle "Revenue by product category".
 | 24 | Revenue | `Revenue` | Millions, 2 decimals |
 | 334 | Items sold | `Items Sold` | None |
 | 644 | Categories with sales | `Categories With Sales` | None |
-| 954 | Top 10 categories share | `Top 10 Categories Share` | |
+| 954 | Top categories share | `Top Categories Share` | |
 
 **Charts:**
 
@@ -142,7 +142,7 @@ Title "Who sells", subtitle "Sellers as suppliers: revenue, delivery and reviews
 | x | Label | Measure | Display units |
 |---|---|---|---|
 | 24 | Active sellers | `Active Sellers` | None |
-| 334 | Top 10% sellers share | `Top 10% Sellers Share` | |
+| 334 | Top sellers share | `Top Sellers Share` | |
 | 644 | Revenue | `Revenue` | Millions, 2 decimals |
 | 954 | Late deliveries | `Late Deliveries %` | |
 
