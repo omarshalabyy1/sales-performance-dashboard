@@ -3,6 +3,10 @@
 </p>
 
 <p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1200&color=2DD4BF&center=true&vCenter=true&width=760&lines=96%2C478+orders%2C+five+Power+BI+pages;Late+orders%3A+2.27+stars%2C+on+time%3A+4.29;Top+10%25+of+sellers%3A+67%25+of+revenue" alt="96,478 orders, five Power BI pages">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Power_BI-DAX_%26_Power_Query-F2C811?style=for-the-badge&logo=powerbi&logoColor=black" alt="Power BI, DAX and Power Query">
   <img src="https://img.shields.io/badge/Python-pandas-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python and pandas">
   <img src="https://img.shields.io/badge/DuckDB-Star_schema-FFF000?style=for-the-badge&logo=duckdb&logoColor=black" alt="DuckDB star schema">
@@ -38,6 +42,10 @@ dimension answers one of them; the fact table in the middle answers the last.
 ![Five questions, one star](docs/mental-model.svg)
 
 ## 📈 What the numbers say
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/221352987-68da234d-4d62-4e9d-9d7f-098dc657c2dc.gif" width="100" alt="Moving chart">
+</p>
 
 | | |
 |---|---|
@@ -120,6 +128,10 @@ order keeps its latest review.
 
 ## ▶️ Run it
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284087-bbe7e430-757e-4901-90bf-4cd2ce3e1852.gif" width="100" alt="Code">
+</p>
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -167,3 +179,7 @@ kaggle datasets download -d olistbr/brazilian-ecommerce -p data/input --unzip
 ```
 
 `data/input/regions.csv` (Brazil's 27 states in their five official regions) is ours and is in the repo.
+
+<p align="center">
+  <img width="100%" src="docs/footer.svg" alt="Know what sells, who sells it, and what late costs.">
+</p>
