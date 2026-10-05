@@ -1,7 +1,7 @@
 # 6. Checks
 
-The numbers each page must show for the demo run. For a client, refill the values from the notebook's section 12
-(`docs/new-client.md`). They come from the notebook (`analysis/analysis.ipynb`, section 12), and the main
+The numbers each page must show for the demo run. For other data, refill the values from the notebook's section 12.
+They come from the notebook (`analysis/analysis.ipynb`, section 12), and the main
 totals are computed a second time in SQL straight from the input files (`sql/checks.sql`, notebook section 11). If a
 card shows anything else, the build is wrong: see "If a number is off" at the end.
 

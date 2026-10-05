@@ -6,8 +6,8 @@ A Power BI report built end to end, with no database: one Python notebook checks
 writes a star schema, and Power BI adds 23 DAX measures, five pages and row-level security by region. The notebook
 computes every number first, so the report can be checked against it.
 
-New client? See [docs/new-client.md](docs/new-client.md): every client value lives in `config/client.yaml` and
-`data/input/`.
+Every client value (names, file and column names, rules, colours) lives in `config/client.yaml` and the input files
+in `data/input/`.
 
 ## The problem
 
@@ -141,7 +141,7 @@ data/input/          the input files (only regions.csv is in the repo) and their
 analysis/            the notebook: health check, model tables, every number, the charts
 output/              the tables the notebook writes for Power BI (not in the repo)
 sql/                 the SQL cross-check
-docs/                the diagrams and charts used here, and new-client.md
+docs/                the diagrams and charts used here
 powerbi/             the report (.pbip) and build_pbip.py, the step-by-step build, the theme, the checks, the screenshots
 ```
 
