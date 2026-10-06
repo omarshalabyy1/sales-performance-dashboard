@@ -12,7 +12,7 @@
       {
         "name": "OutputFolder",
         "kind": "m",
-        "expression": "\"C:\\Users\\DELL\\GitHub\\sales-performance-dashboard\\output\\\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]",
+        "expression": "\"C:\\Users\\you\\GitHub\\sales-performance-dashboard\\output\\\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]",
         "annotations": [
           {
             "name": "PBI_ResultType",
