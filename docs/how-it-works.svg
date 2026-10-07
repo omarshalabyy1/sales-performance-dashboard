@@ -14,7 +14,7 @@
     <text x="43" y="56" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">1</text>
     <text x="69" y="57" font-size="19" font-weight="700" fill="#0E1630">Load</text>
     <text x="30" y="92" font-size="14" fill="#475569">Orders, items, products, sellers,</text>
-    <text x="30" y="114" font-size="14" fill="#475569">customers and reviews (7 files)</text>
+    <text x="30" y="114" font-size="14" fill="#475569">customers, reviews, category names</text>
   </g>
   <g>
     <rect x="315" y="20" width="270" height="120" rx="10" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>

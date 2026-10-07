@@ -54,7 +54,7 @@ dimension answers one of them; the fact table in the middle answers the last.
 | Revenue (delivered orders, Sep 2016 to Aug 2018) | 13,221,498 from 96,478 orders and 93,358 customers |
 | Growth | 2018 revenue up **145.1%** on the same days of 2017 (7.22M against 2.94M) |
 | Late deliveries | **6.8%** of orders arrived after the estimated date |
-| What late costs | late orders average **2.27** stars against **4.29** on time; **54%** of late orders get 1 star, against 7% on time |
+| What late costs | late orders average **2.27** stars against **4.29** on time; **54%** of reviewed late orders get 1 star, against 7% of reviewed on-time orders |
 | Seller concentration | the top 10% of sellers (297 of 2,970) bring **67.1%** of revenue |
 | Category concentration | the top 10 of 74 categories bring **62.4%** of revenue |
 | Repeat buyers | only **3.0%** of customers ordered a second time |
@@ -190,7 +190,7 @@ Download it from that page and unzip it into `data/input/`, or with the Kaggle c
 kaggle datasets download -d olistbr/brazilian-ecommerce -p data/input --unzip
 ```
 
-`data/input/regions.csv` (Brazil's 27 states in their five official regions) is ours and is in the repo.
+`data/input/regions.csv` (Brazil's 26 states and the Federal District, in their five official regions) is ours and is in the repo.
 
 <p align="center">
   <img width="100%" src="docs/footer.svg" alt="Know what sells, who sells it, and what late costs.">
