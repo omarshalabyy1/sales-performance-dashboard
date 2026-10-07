@@ -12,6 +12,8 @@
   <img src="https://img.shields.io/badge/DuckDB-Star_schema-FFF000?style=for-the-badge&logo=duckdb&logoColor=black" alt="DuckDB star schema">
 </p>
 
+> 📖 **New to data?** [The project explained, from zero](docs/explained.md): every word, every number and the interview questions, in plain words.
+
 <h3 align="center">96,478 orders: orders that arrived late scored 2.27 stars against 4.29 on time,<br>and the top 10% of sellers brought 67% of revenue.</h3>
 
 A Power BI report built end to end, with no database: one Python notebook checks and cleans the input files and
