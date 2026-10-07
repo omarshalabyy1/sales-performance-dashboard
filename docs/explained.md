@@ -29,7 +29,7 @@ Think of it like a till receipt for every item sold. Each receipt line is one it
 | **Estimated date** | The delivery date the customer was promised when they ordered. |
 | **Late** | Delivered on a later day than the estimated date. Only the dates count, not the time of day. The rule is `rules.late_after_days: 0`. |
 | **Review score** | 1 to 5 stars the customer gave the order. When an order has more than one review, the latest answered one counts. |
-| **Region** | Brazil's 27 states sit in five official regions (Southeast, South, Northeast, Center-West, North). `data/input/regions.csv` gives each state its region. |
+| **Region** | Brazil's 26 states and the Federal District sit in five official regions (Southeast, South, Northeast, Center-West, North). `data/input/regions.csv` gives each state its region. |
 | **Notebook** | `analysis/analysis.ipynb`, a file that mixes code, its output and notes. It is the source of truth for every number. |
 | **Python, pandas** | Python is a programming language. pandas is its library for tables. The notebook uses it. |
 | **CSV** | Comma-separated values: a plain text file of a table, one row per line. Every input and output file is a CSV. |
