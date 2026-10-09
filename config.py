@@ -22,7 +22,8 @@ REQUIRED = (
     + [f"inputs.{f}" for f in FILES]
     + [f"columns.{f}.{c}" for f, cols in STANDARD.items() for c in cols]
     + ["rules.sale_statuses", "rules.late_after_days",
-       "report.title", "report.compare_year", "report.top_categories", "report.top_sellers_percent",
+       "report.title", "report.compare_year", "report.date_start", "report.date_end",
+       "report.top_categories", "report.top_sellers_percent",
        "report.colours.data", "report.colours.text", "report.colours.muted",
        "report.colours.page", "report.colours.line", "report.colours.danger"]
 )

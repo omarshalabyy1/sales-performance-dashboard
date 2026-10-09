@@ -58,6 +58,8 @@ rules:
 report:
   title: Sales performance dashboard # the Power BI theme name
   compare_year: 2018                 # the year compared with the same days of the year before (Sales page)
+  date_start: 2016-01-01             # dim_date runs from this day (powerbi/02-model.md, written in by build_pbip.py)
+  date_end: 2018-12-31               # to this day; the notebook stops if an order date falls outside
   top_categories: 10                 # "top N categories" share (notebook, Power BI)
   top_sellers_percent: 10            # "top N% of sellers" share (notebook, Power BI)
   colours:                           # the Power BI theme (python theme.py) and the notebook charts

@@ -444,12 +444,12 @@
             "source": {
               "type": "calculated",
               "expression": [
-                "VAR FirstYear = YEAR ( MIN ( fact_sales[order_date] ) )",
-                "VAR LastYear = YEAR ( MAX ( fact_sales[order_date] ) )",
+                "VAR FirstDay = DATE ( 2016, 1, 1 )",
+                "VAR LastDay = DATE ( 2018, 12, 31 )",
                 "VAR LastSaleDate = MAX ( fact_sales[order_date] )",
                 "RETURN",
                 "    ADDCOLUMNS (",
-                "        CALENDAR ( DATE ( FirstYear, 1, 1 ), DATE ( LastYear, 12, 31 ) ),",
+                "        CALENDAR ( FirstDay, LastDay ),",
                 "        \"Year\", YEAR ( [Date] ),",
                 "        \"Month Number\", MONTH ( [Date] ),",
                 "        \"Month\", FORMAT ( [Date], \"mmm\" ),",

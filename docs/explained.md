@@ -162,7 +162,7 @@ Things that can look wrong but are not:
 | **110,197 fact_sales** | data-flow.svg, data-model.svg | One row per item of a delivered order. Cell 8. |
 | **32,951, 3,095, 99,441** | data-flow.svg, data-model.svg | Rows in `dim_product`, `dim_seller`, `dim_customer`: every product, seller and customer row, sold or not. Cell 8. |
 | **1 report_settings row** | data-flow.svg, data-model.svg | One row holding the two top-N values (10 and 10) from `client.yaml`. Hidden in the report and joined to nothing. |
-| **1,096 days** | data-flow.svg, data-model.svg | Rows in `dim_date`: 1 Jan 2016 to 31 Dec 2018, whole years (366 + 365 + 365). Built in DAX (`powerbi/02-model.md`), checked as C2 in `06-checks.md`; not printed by the notebook. |
+| **1,096 days** | data-flow.svg, data-model.svg | Rows in `dim_date`: 1 Jan 2016 to 31 Dec 2018, whole years (366 + 365 + 365), set in `config/client.yaml` (`report.date_start`, `report.date_end`). Built in DAX (`powerbi/02-model.md`), checked as C2 in `06-checks.md`; not printed by the notebook. |
 | **23 measures, in 6 display folders** | data-flow.svg, data-model.svg, how-it-works.svg | See section 2. |
 | **1 to \*** | data-model.svg | One dimension row links to many fact rows: one seller has many items sold. |
 | **3 charts** | data-flow.svg | The three PNG files in `docs/` the notebook draws, in the Reporting layer. |

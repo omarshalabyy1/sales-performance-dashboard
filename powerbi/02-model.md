@@ -19,7 +19,7 @@ filter flowing one way, from the dimension to the fact.
 | Table | Grain | Key | Rows |
 |---|---|---|---|
 | `fact_sales` | One order item of a sale order (`rules.sale_statuses`) | `order_id` + `item_no` | `06-checks.md` C1 |
-| `dim_date` | One day, 1 Jan of the first order year to 31 Dec of the last | `Date` | C2 |
+| `dim_date` | One day, `report.date_start` to `report.date_end` in `config/client.yaml` | `Date` | C2 |
 | `dim_product` | One product | `product_id` | C3 |
 | `dim_seller` | One seller | `seller_id` | C4 |
 | `dim_customer` | One customer address (`customer_id`) | `customer_id` | C5 |
@@ -35,12 +35,12 @@ order, have no table of their own, and the delivery page uses them as chart axes
 
 ```dax
 dim_date =
-VAR FirstYear = YEAR ( MIN ( fact_sales[order_date] ) )
-VAR LastYear = YEAR ( MAX ( fact_sales[order_date] ) )
+VAR FirstDay = DATE ( 2016, 1, 1 )
+VAR LastDay = DATE ( 2018, 12, 31 )
 VAR LastSaleDate = MAX ( fact_sales[order_date] )
 RETURN
     ADDCOLUMNS (
-        CALENDAR ( DATE ( FirstYear, 1, 1 ), DATE ( LastYear, 12, 31 ) ),
+        CALENDAR ( FirstDay, LastDay ),
         "Year", YEAR ( [Date] ),
         "Month Number", MONTH ( [Date] ),
         "Month", FORMAT ( [Date], "mmm" ),
@@ -50,9 +50,13 @@ RETURN
     )
 ```
 
-- Whole years, as time intelligence needs.
+- `FirstDay` and `LastDay` are `report.date_start` and `report.date_end` in `config/client.yaml`, whole years, as
+  time intelligence needs. `build_pbip.py` writes them in from the config; when you paste by hand, type the config's
+  two dates. The range is never read from `fact_sales`, so the table is not built from the fact, and the notebook
+  stops if an order date falls outside it.
 - `Date With Sales` is TRUE up to the last order date. `Revenue LY` uses it, so when the data stops inside a year
   (the demo stops on 29 Aug 2018) that year is compared with the same days of the year before, not the whole year.
+  `LastSaleDate` is the only read of `fact_sales`: it flags days for display, it never sets the range.
 - **Table tools → Mark as date table → Date column: `Date`.**
 - Set the data types: `Date` = Date, `Year`, `Month Number`, `Year Month Number` = Whole number,
   `Date With Sales` = True/False.

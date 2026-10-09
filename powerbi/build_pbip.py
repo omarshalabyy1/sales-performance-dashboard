@@ -47,6 +47,9 @@ def m_blocks():
 def date_dax():
     text = (HERE / "02-model.md").read_text(encoding="utf-8")
     block = re.search(r"```dax\ndim_date =\n(.*?)```", text, re.S).group(1)
+    for var, day in (("FirstDay", cfg["report"]["date_start"]), ("LastDay", cfg["report"]["date_end"])):
+        block, found = re.subn(rf"VAR {var} = DATE \(.*?\)\n", f"VAR {var} = DATE ( {day.year}, {day.month}, {day.day} )\n", block)
+        assert found == 1, f"02-model.md: dim_date needs one line 'VAR {var} = DATE ( ... )'"
     return block.rstrip("\n")
 
 
