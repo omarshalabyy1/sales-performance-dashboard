@@ -36,7 +36,7 @@ Every report starts with a day of cleaning, and the totals never agree.
 
 ## 🛠️ The solution
 
-![How it works](docs/how-it-works.svg)
+![How it works, in six layers: Bronze, the input files as received; Silver, mapped, typed and checked; Gold, the rules; Semantic, the star schema; Analytical, 23 DAX measures; Reporting, five pages](docs/how-it-works.svg)
 
 One model answers five questions: when, what sold, who sold it, who bought it, and how the order went. Each
 dimension answers one of them; the fact table in the middle answers the last.
@@ -161,13 +161,24 @@ config.py            load_config() and the input checks (python config.py)
 theme.py             writes powerbi/05-theme.json from the config
 data/input/          the input files (only regions.csv is in the repo) and their guide
 analysis/            the notebook: health check, model tables, every number, the charts
-output/              the tables the notebook writes for Power BI (not in the repo)
+output/              the Semantic layer: the tables the notebook writes for Power BI (not in the repo)
 sql/                 the SQL cross-check
 docs/                the diagrams and charts used here
 powerbi/             the report (.pbip) and build_pbip.py, the step-by-step build, the theme, the checks, the screenshots
 ```
 
 ## 🏗️ For engineers
+
+The steps are named after the six layers. There is no database: each layer is a file, a notebook section or a part of the Power BI report.
+
+| Layer | In this repo |
+|---|---|
+| Bronze layer | The input files in `data/input/`, as received; the notebook only reads them |
+| Silver layer | Notebook sections 1 and 2: the mapped columns, typed, with every id and link checked; no row is dropped |
+| Gold layer | The rules, applied once: delivered orders, the late rule, each order's latest review, each state's region (sections 2 and 3) |
+| Semantic layer | `fact_sales` and the three dimensions in `output/`, written in section 3; Power BI adds `dim_date` and the five region roles |
+| Analytical layer | The 23 DAX measures (`powerbi/03-measures.dax`) and the numbers in notebook sections 4 to 9 |
+| Reporting layer | The five Power BI pages and the three README charts (section 10) |
 
 Every table, the tables it is built from, and its row count after one run:
 

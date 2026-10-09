@@ -36,6 +36,7 @@ Think of it like a till receipt for every item sold. Each receipt line is one it
 | **SQL** | Structured Query Language, the language used to ask a database questions. `sql/checks.sql` is SQL. |
 | **DuckDB** | A small database that runs inside Python, with nothing to install or start. The project uses it only for the SQL check, reading the input files directly. That is why the README says "no database" and still shows a DuckDB badge. |
 | **Table, row, column** | Like a spreadsheet sheet: each row is one thing (one item, one seller), each column is one fact about it (its price, its state). |
+| **The six layers** | The names of the steps, in order. **Bronze layer:** the input files as received. **Silver layer:** the same rows with the mapped columns, typed and checked. **Gold layer:** the business rules: what counts as a sale, the late rule, the latest review, the region of each state. **Semantic layer:** the fact and dimension tables Power BI loads. **Analytical layer:** the aggregates and KPIs, here the DAX measures and the notebook's numbers. **Reporting layer:** the Power BI pages and the charts. The README's "For engineers" table says where each one is. |
 | **Fact table** | The big table of events you add up. Here `fact_sales`: one row per item sold, with its price and freight. |
 | **Dimension table** | A lookup table that describes the facts: `dim_product` (the category), `dim_seller` (city, state, region), `dim_customer` (the person, city, state, region) and `dim_date` (day, month, year). You filter and group by them. |
 | **Star schema** | One fact table in the middle with dimension tables around it, like a star. It is the standard shape for Power BI reports. See [data-model.svg](data-model.svg). |
@@ -63,16 +64,16 @@ Run in this order (the commands are in the README's "Run it" section):
 |---|---|---|
 | 0 | `requirements.txt` | The Python libraries to install: PyYAML, pandas, matplotlib, DuckDB, Jupyter. |
 | 0 | `config/client.yaml`, `config.py` | Hold every setting. `python config.py` checks that the 8 input files exist and have the needed columns, and stops with one line if not. |
-| 1 | notebook sections 1 to 2 (cells 3, 5, 6) | Reads the 8 files, keeps only the mapped columns, then runs the health check: ids are unique, every item points to a real order, product and seller, every state has a region. It also counts what it will leave out (non-sale orders, extra reviews). |
-| 2 | notebook section 3 (cell 8) | Applies the rules once and writes the model tables to `output/`: `fact_sales`, `dim_product`, `dim_seller`, `dim_customer` and `report_settings` (the top-N values for DAX). |
-| 3 | notebook sections 4 to 10 (cells 10 to 26) | Computes every number in the README and draws the three charts in `docs/`. |
-| 4 | notebook section 11 (cell 28) + `sql/checks.sql` | Computes revenue, orders, customers, late %, average review and growth again in SQL with DuckDB, straight from the input files. The notebook stops if any value differs. |
+| 1 | notebook sections 1 to 2 (cells 3, 5, 6) | Silver layer, from the Bronze input files: reads the 8 files, keeps only the mapped columns, then runs the health check: ids are unique, every item points to a real order, product and seller, every state has a region. It also counts what it will leave out (non-sale orders, extra reviews); those rows are counted, not kept. |
+| 2 | notebook section 3 (cell 8) | Gold and Semantic layers: applies the rules once and writes the model tables to `output/`: `fact_sales`, `dim_product`, `dim_seller`, `dim_customer` and `report_settings` (the top-N values for DAX). |
+| 3 | notebook sections 4 to 10 (cells 10 to 26) | Analytical layer: computes every number in the README. Reporting layer: draws the three charts in `docs/`. |
+| 4 | notebook section 11 (cell 28) + `sql/checks.sql` | Computes revenue, orders, customers, late %, average review and growth again in SQL with DuckDB, straight from the input files. The notebook stops if any value differs. This check is not a layer. |
 | 5 | notebook section 12 (cell 30) | Prints the value every Power BI card must show; they are copied into `powerbi/06-checks.md`. |
 | 6 | `theme.py` | Writes the Power BI theme file from the colours in `client.yaml`. |
-| 7 | `powerbi/build_pbip.py` | Writes the Power BI project from the build pack in `powerbi/` (queries, model, measures, pages). You open the `.pbip` and click **Refresh now**. |
+| 7 | `powerbi/build_pbip.py` | Writes the Power BI project from the build pack in `powerbi/` (queries, model, measures, pages): the Semantic, Analytical and Reporting layers in Power BI. You open the `.pbip` and click **Refresh now**. |
 | 8 | `powerbi/01` to `08` | The same report, step by step by hand: queries, model, measures, pages, theme, the 43 checks (`06-checks.md`), interactions, and a 47-step checklist. |
 
-The 8 input files: 7 come from the marketplace (orders, order items, products, sellers, customers, reviews, category names; you download them, see Data in the README) and 1 is ours, committed in `data/input/` (`regions.csv`, the region of every state). The "How it works" diagram lists six of the seven by name; the seventh is the category names file, which turns a category code into a readable name.
+The 8 input files: 7 come from the marketplace (orders, order items, products, sellers, customers, reviews, category names; you download them, see Data in the README) and 1 is ours, committed in `data/input/` (`regions.csv`, the region of every state). The data-flow diagram names all eight; the category names file turns a category code into a readable name.
 
 ### The rules, with an example
 
@@ -154,15 +155,18 @@ Things that can look wrong but are not:
 | **99,441 orders, 112,650 items, 99,224 reviews, 32,951 products, 3,095 sellers, 99,441 customers** | data-flow.svg | Rows read from each input file. Notebook cell 3. |
 | **71 category names** | data-flow.svg | Rows in the category names file. The notebook does not print this count; it was counted from the file. |
 | **27 regions** | data-flow.svg | Brazil's 26 states plus the Federal District, in `regions.csv`. Counted from the file, not printed by the notebook. |
+| **Same counts in the Bronze and Silver columns** | data-flow.svg | The Silver layer drops no row: it keeps the mapped columns, types them and checks every id and link. |
+| **98,673 latest_review** | data-flow.svg | Orders with at least one review: 99,224 reviews minus the 551 extra ones on an order that already has one (cell 5). Counted from the reviews file. |
+| **27 REGION_OF** | data-flow.svg | The state-to-region map built from `regions.csv` in cell 8. |
 | **96,478 sale_orders** | data-flow.svg | Orders with status `delivered`. Cell 6. |
 | **110,197 fact_sales** | data-flow.svg, data-model.svg | One row per item of a delivered order. Cell 8. |
 | **32,951, 3,095, 99,441** | data-flow.svg, data-model.svg | Rows in `dim_product`, `dim_seller`, `dim_customer`: every product, seller and customer row, sold or not. Cell 8. |
 | **1 report_settings row** | data-flow.svg, data-model.svg | One row holding the two top-N values (10 and 10) from `client.yaml`. Hidden in the report and joined to nothing. |
-| **1,096 days** | data-model.svg | Rows in `dim_date`: 1 Jan 2016 to 31 Dec 2018, whole years (366 + 365 + 365). Built in DAX (`powerbi/02-model.md`), checked as C2 in `06-checks.md`; not printed by the notebook. |
-| **23 measures, in 6 display folders** | data-model.svg, how-it-works.svg | See section 2. |
+| **1,096 days** | data-flow.svg, data-model.svg | Rows in `dim_date`: 1 Jan 2016 to 31 Dec 2018, whole years (366 + 365 + 365). Built in DAX (`powerbi/02-model.md`), checked as C2 in `06-checks.md`; not printed by the notebook. |
+| **23 measures, in 6 display folders** | data-flow.svg, data-model.svg, how-it-works.svg | See section 2. |
 | **1 to \*** | data-model.svg | One dimension row links to many fact rows: one seller has many items sold. |
-| **3 charts** | data-flow.svg | The three PNG files in `docs/` the notebook draws. |
-| **1 to 6** | how-it-works.svg | The six steps: load, clean, model, measure, report, secure. |
+| **3 charts** | data-flow.svg | The three PNG files in `docs/` the notebook draws, in the Reporting layer. |
+| **01 to 06** | how-it-works.svg | The six layers: Bronze, Silver, Gold, Semantic, Analytical, Reporting. The five region roles belong to the Semantic layer, with the model. |
 | **+145%, 62%, 67%, 93,358, 3%, 2.27, 4.29, 5 roles** | mental-model.svg | The same numbers as the results table above, rounded. |
 | **96,478, +145.1%, 6.8%, 2.27, 4.29** | header.svg | The same numbers as the results table above. |
 
